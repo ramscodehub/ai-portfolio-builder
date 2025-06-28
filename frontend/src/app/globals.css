@@ -1,0 +1,57 @@
+/* frontend/src/app/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap'); /* Example fonts */
+
+:root {
+  --max-width: 1200px; /* Increased max width for a more spacious feel */
+  --border-radius: 8px; /* Standard border radius */
+  --card-border-radius: 12px; /* For gallery cards */
+
+  /* Dark Theme Palette (inspired by Orchids.app) */
+  --background-color: #121212; /* Very dark gray / near black */
+  --surface-color: #1E1E1E; /* Slightly lighter for cards, input backgrounds */
+  --primary-text-color: #E0E0E0; /* Light gray for primary text */
+  --secondary-text-color: #A0A0A0; /* Medium gray for secondary text */
+  --accent-color: #BB86FC; /* A vibrant purple accent (placeholder, can adjust) */
+  --accent-color-hover: #9a67d3;
+  --border-color: #333333; /* Darker border color */
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif; /* For headlines */
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  color-scheme: dark; /* Hint to browser for dark mode defaults for form controls etc. */
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--primary-text-color);
+  background-color: var(--background-color);
+  line-height: 1.6;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Remove default focus outline for custom implementation if needed, but ensure accessibility */
+*:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}

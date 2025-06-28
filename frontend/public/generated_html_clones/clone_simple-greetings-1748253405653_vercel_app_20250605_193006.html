@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Clone</title>
+    <style>
+        :root {
+            --bg-color: #100F0D;
+            --text-color: #E0E0E0;
+            --accent-color: #CCA43B;
+            --card-bg-color: #1A1815;
+            --border-color: #333333; /* Darker border for subtle divisions */
+            --font-primary: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-primary);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 5%;
+            background-color: var(--bg-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        header > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header a[href="/"] { /* Logo */
+            font-size: 1.8em;
+            font-weight: 700; /* Bolder logo */
+            color: var(--text-color);
+        }
+
+        header nav {
+            display: flex;
+            gap: 35px; /* Increased gap */
+        }
+
+        header nav a {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            padding-bottom: 8px; /* More space for underline */
+            color: #B0B0B0; /* Slightly muted nav links */
+            transition: color 0.3s ease;
+        }
+        header nav a:hover {
+            color: var(--text-color);
+        }
+
+        header nav a span {
+            display: block;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        header nav a:hover span,
+        header nav a[href="/"].active span { /* Assuming an active class or similar for current page */
+            width: 100%;
+        }
+        header nav a[href="/"] span { /* Specifically for Home link as per screenshot */
+             width: 100%;
+        }
+         header nav a[href="/"] {
+             color: var(--text-color); /* Active link text color */
+        }
+
+
+        header div:last-child button { /* Hamburger button */
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            width: 30px;
+            height: 22px;
+            position: relative;
+            padding: 0;
+        }
+        header div:last-child button span { /* Middle line */
+            display: block;
+            position: relative; /* Changed from absolute to relative for easier centering if button has padding */
+            width: 24px; /* Width of lines */
+            height: 2px; /* Thickness of lines */
+            background-color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        header div:last-child button span::before,
+        header div:last-child button span::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        header div:last-child button span::before { top: -7px; }
+        header div:last-child button span::after { top: 7px; }
+
+        /* Main Content */
+        main {
+            padding-top: 78px; /* Header height + border */
+        }
+
+        /* Section 1: Hero */
+        main section:first-child {
+            min-height: calc(100vh - 78px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 5%;
+            background-color: var(--bg-color);
+        }
+
+        main section:first-child > div {
+            max-width: 900px;
+        }
+
+        main section:first-child h1 {
+            font-size: clamp(3rem, 10vw, 7.5rem); /* Slightly larger max */
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 25px;
+            line-height: 1.05; /* Tighter line height for large text */
+            letter-spacing: -0.03em; /* Fine-tune letter spacing */
+        }
+
+        main section:first-child h1 span {
+            display: inline-block;
+        }
+         main section:first-child h1 span:nth-child(7) { /* Space after comma */
+            margin-left: 0.2em;
+        }
+         main section:first-child h1 span:nth-child(12) { /* Space after S */
+            margin-left: 0.2em;
+        }
+
+
+        main section:first-child div > p {
+            font-size: clamp(1rem, 2.5vw, 1.3rem); /* Slightly larger max */
+            color: var(--text-color);
+            max-width: 650px; /* Wider text block */
+            margin: 0 auto 50px auto;
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+
+        main section:first-child div > div { /* Scroll to explore container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85em;
+            color: var(--text-color);
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        main section:first-child div > div > div { /* Mouse icon */
+            width: 24px;
+            height: 38px;
+            border: 2px solid var(--text-color);
+            border-radius: 12px;
+            position: relative;
+        }
+        main section:first-child div > div > div::after { /* Mouse wheel */
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 8px;
+            background-color: var(--text-color);
+            border-radius: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 8px;
+            animation: scroll-wheel-animation 1.8s infinite ease-in-out;
+        }
+
+        @keyframes scroll-wheel-animation {
+            0% { top: 8px; opacity: 1; }
+            30% { top: 16px; opacity: 0; }
+            31% { top: 6px; opacity: 0; } /* Reappear at top quickly */
+            60% { top: 8px; opacity: 1; }
+            100% { top: 8px; opacity: 1; }
+        }
+
+        /* Section 2: Featured Work */
+        section:nth-child(2) {
+            padding: 100px 5%; /* More padding */
+            background-color: var(--card-bg-color);
+        }
+
+        section:nth-child(2) > div {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        section:nth-child(2) > div > div:first-child {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        section:nth-child(2) h2 {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        section:nth-child(2) > div > div:first-child > p { /* Target specific p */
+            font-size: 1.1rem;
+            color: var(--text-color);
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.8;
+            line-height: 1.7;
+        }
+
+        div[role="region"] {
+            position: relative;
+        }
+
+        div[role="region"] > div {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 25px;
+            padding: 10px 0 30px 0; /* Padding for shadow/scrollbar visibility */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        div[role="region"] > div::-webkit-scrollbar {
+            display: none;
+        }
+
+        div[role="group"] {
+            flex: 0 0 clamp(300px, calc(33.333% - 20px), 380px); /* Aim for 3 cards on desktop */
+            scroll-snap-align: start;
+            min-width: 280px; /* Ensure cards don't get too small */
+        }
+
+        div[role="article"] {
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        div[role="article"]:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+        }
+
+        div[role="article"] > div {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        div[role="article"] img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        div[role="article"] > div > div:nth-child(2) { /* Gradient overlay */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(to top, rgba(16,15,13,0.85) 0%, rgba(16,15,13,0) 70%);
+        }
+
+        div[role="article"] > div > div:nth-child(3) {
+            padding: 20px 25px 25px; /* More padding */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        div[role="article"] h3 {
+            font-size: 1.3rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        div[role="article"] p { /* Description in card */
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+
+        div[role="article"] > div > div:nth-child(3) > div > div:first-child { /* Tags */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        div[role="article"] > div > div:nth-child(3) > div > div:first-child span {
+            background-color: rgba(204, 164, 59, 0.1);
+            color: var(--accent-color);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.7em;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        section:nth-child(2) > div > div:last-child { /* Carousel nav buttons container */
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 50px;
+        }
+
+        section:nth-child(2) > div > div:last-child button {
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        section:nth-child(2) > div > div:last-child button:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+            transform: scale(1.1);
+        }
+        section:nth-child(2) > div > div:last-child button span { display: none; }
+        section:nth-child(2) > div > div:last-child button:first-of-type::before { content: '←'; }
+        section:nth-child(2) > div > div:last-child button:last-of-type::before { content: '→'; }
+
+        /* Section 3: Skills Marquee */
+        section:nth-child(3) {
+            padding: 80px 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            position: relative;
+        }
+        /* Optional subtle gradient fade at edges of marquee */
+        section:nth-child(3)::before, section:nth-child(3)::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 100px; /* Adjust width of fade */
+            z-index: 2;
+        }
+        section:nth-child(3)::before { left: 0; background: linear-gradient(to right, var(--bg-color) 0%, transparent 100%);}
+        section:nth-child(3)::after { right: 0; background: linear-gradient(to left, var(--bg-color) 0%, transparent 100%);}
+
+
+        section:nth-child(3) > div { /* Marquee row container */
+            display: flex;
+            white-space: nowrap;
+        }
+        section:nth-child(3) > div:first-of-type { margin-bottom: 30px; } /* Space between marquees */
+        
+        section:nth-child(3) > div > div { /* Inner div containing spans, for animation */
+            display: flex; /* Make spans animate as a block */
+            animation: marquee 80s linear infinite;
+        }
+
+        section:nth-child(3) > div:nth-child(2) > div { /* Second marquee, reverse direction */
+            animation: marquee-reverse 80s linear infinite;
+        }
+
+        section:nth-child(3) span {
+            font-size: clamp(1.8rem, 5vw, 3rem); /* Larger marquee text */
+            font-weight: 600;
+            color: rgba(255,255,255,0.12); /* More subtle */
+            padding: 0 40px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes marquee-reverse {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(0%); }
+        }
+        /* Empty divs in section 3 are ignored as per plan */
+
+        /* Section 4: Testimonial */
+        section:nth-child(4) {
+            padding: 120px 5%;
+            background-image: url('placeholder-testimonial-bg.jpg'); /* Placeholder */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            text-align: center;
+            position: relative;
+            color: var(--text-color);
+        }
+        section:nth-child(4)::before { /* Overlay */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(16,15,13,0.75); /* Darker overlay */
+            z-index: 1;
+        }
+        /* Targeting the content div based on structure: section > div:nth-child(4) > div */
+        section:nth-child(4) > div:nth-child(4) > div {
+            position: relative; /* Ensure content is above overlay */
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        section:nth-child(4) blockquote p {
+            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-weight: 500; /* Not too bold for quote */
+            line-height: 1.5;
+            margin-bottom: 35px;
+            font-style: italic;
+            color: #FFFFFF; /* Brighter white for quote */
+        }
+
+        section:nth-child(4) cite {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: block;
+            font-style: normal;
+            color: var(--text-color);
+        }
+
+        section:nth-child(4) cite + p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        section:nth-child(4) > div:nth-child(4) > div > div:last-child > div { /* Decorative line */
+            width: 70px;
+            height: 3px;
+            background-color: var(--accent-color);
+            margin: 40px auto 0; /* More space above */
+            border-radius: 2px;
+        }
+
+        /* Section 5: Let's Build Together CTA */
+        section:nth-child(5) {
+            padding: 100px 5%;
+            background-color: var(--card-bg-color);
+        }
+
+        section:nth-child(5) > div:first-child { /* Main container */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section:nth-child(5) > div:first-child > div { /* Flex/grid container */
+            display: flex;
+            gap: 60px; /* Increased gap */
+            align-items: center; /* Vertically align content better */
+        }
+        
+        /* Left column (Text and buttons) */
+        section:nth-child(5) > div:first-child > div > div:first-child > div > div:first-child {
+            flex: 1.5;
+        }
+
+        section:nth-child(5) h2 {
+            font-size: clamp(2.5rem, 5vw, 3.8rem); /* Larger heading */
+            color: var(--text-color);
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        section:nth-child(5) h2 span { /* "Together" */
+            color: var(--accent-color);
+            display: block;
+        }
+        
+        /* Targeting specific paragraphs */
+        section:nth-child(5) > div:first-child > div > div:first-child > div > div:first-child > div:first-of-type p {
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            line-height: 1.8; /* More line height */
+        }
+
+        section:nth-child(5) > div:first-child > div > div:first-child > div > div:first-child > div:last-of-type { /* Buttons container */
+            margin-top: 35px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        section:nth-child(5) a[href^="mailto:"], section:nth-child(5) a[href="/contact"] {
+            padding: 14px 30px; /* Larger buttons */
+            border-radius: 6px;
+            font-weight: 600; /* Bolder button text */
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            border: 2px solid transparent;
+            display: inline-block; /* Ensure proper padding and border */
+        }
+
+        section:nth-child(5) a[href^="mailto:"] {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+        section:nth-child(5) a[href^="mailto:"]:hover {
+            background-color: transparent;
+            color: var(--accent-color);
+        }
+
+        section:nth-child(5) a[href="/contact"] {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        section:nth-child(5) a[href="/contact"]:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        /* Right column (Stats and decorative elements) */
+        section:nth-child(5) > div:first-child > div > div:last-child {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            padding-left: 40px; /* More space for deco elements */
+            min-height: 250px; /* Ensure space for abs positioned elements */
+        }
+        
+        /* Stat items */
+        section:nth-child(5) > div:first-child > div > div:last-child > div:nth-of-type(4), /* 50+ Projects */
+        section:nth-child(5) > div:first-child > div > div:last-child > div:nth-of-type(5)  /* 5* Client Rating */
+        {
+            position: relative; z-index: 1; /* Above decorative elements */
+        }
+
+        section:nth-child(5) > div:first-child > div > div:last-child > div > div:first-child { /* Number/Star */
+            font-size: clamp(2.8rem, 6vw, 3.5rem);
+            font-weight: 700;
+            color: var(--accent-color);
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        section:nth-child(5) > div:first-child > div > div:last-child > div > div:last-child { /* Text label */
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Decorative elements */
+        section:nth-child(5) > div:first-child > div > div:last-child > div:nth-child(1) {
+            position: absolute; width: 100px; height: 100px; background-color: rgba(204, 164, 59, 0.07); border-radius: 8px; top: 0%; left: 5%; transform: rotate(15deg); z-index: 0;
+        }
+        section:nth-child(5) > div:first-child > div > div:last-child > div:nth-child(2) {
+            position: absolute; width: 50px; height: 50px; background-color: var(--accent-color); opacity: 0.4; border-radius: 4px; top: 55%; right: 20%; transform: rotate(-10deg); z-index: 0;
+        }
+        section:nth-child(5) > div:first-child > div > div:last-child > div:nth-child(3) {
+            position: absolute; width: 70px; height: 70px; border: 2px solid rgba(204, 164, 59, 0.2); border-radius: 6px; bottom: 0%; left: 30%; transform: rotate(5deg); z-index: 0;
+        }
+        
+        /* Pre-Footer Contact Bar */
+        body > div:nth-last-of-type(2) { /* The div before footer */
+            background-color: var(--card-bg-color);
+            padding: 35px 5%;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        body > div:nth-last-of-type(2) > div > div {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        body > div:nth-last-of-type(2) > div > div > div:first-child {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        body > div:nth-last-of-type(2) > div > div > div:first-child > div:first-child {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        body > div:nth-last-of-type(2) > div > div > div:first-child > div:last-child {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        body > div:nth-last-of-type(2) > div > div > div:first-child > div:last-child a {
+            font-size: 1rem;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        body > div:nth-last-of-type(2) > div > div > div:first-child > div:last-child a:hover {
+            text-decoration: underline;
+            text-decoration-color: var(--accent-color);
+        }
+
+        body > div:nth-last-of-type(2) > div > div > div:last-child {
+            display: flex;
+            gap: 12px;
+        }
+
+        body > div:nth-last-of-type(2) > div > div > div:last-child a {
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        body > div:nth-last-of-type(2) > div > div > div:last-child a:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        /* Footer */
+        footer#main-footer {
+            background-color: #0A0908;
+            color: #A0A0A0;
+            padding: 70px 5% 30px;
+        }
+
+        footer#main-footer > div {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        footer#main-footer > div > div:first-child {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Adjust minmax for columns */
+            gap: 40px 30px; /* Row and column gap */
+            margin-bottom: 50px;
+            padding-bottom: 50px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        footer h3 {
+            font-size: 1.6rem;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        footer h4 {
+            font-size: 1.05rem; /* Slightly smaller */
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px; /* More spacing */
+        }
+
+        footer p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 20px; /* Consistent margin */
+        }
+
+        footer a {
+            color: #A0A0A0;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        footer a:hover {
+            color: var(--accent-color);
+        }
+
+        footer > div > div:first-child > div:first-child a { /* Email/Phone in footer col 1 */
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500; /* Slightly bolder */
+        }
+        footer > div > div:first-child > div:first-child a:hover {
+            color: var(--accent-color);
+        }
+
+
+        footer nav a {
+            display: block;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        footer nav a span span {
+            display: block; position: absolute; bottom: -3px; left: 0; width: 0; height: 1px; background-color: var(--accent-color); transition: width 0.3s ease;
+        }
+        footer nav a:hover span span { width: 25px; }
+
+        footer > div > div:first-child > div:nth-child(3) > div > div {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        footer > div > div:first-child > div:last-child > div:first-of-type { /* Social icons container */
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        footer > div > div:first-child > div:last-child > div:first-of-type a { /* Social icon */
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #A0A0A0;
+        }
+        footer > div > div:first-child > div:last-child > div:first-of-type a:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        footer > div > div:first-child > div:last-child > div:last-of-type a { /* Privacy, Terms */
+            margin-right: 20px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        footer > div > div:first-child > div:last-child > div:last-of-type a:last-child {
+            margin-right: 0;
+        }
+
+
+        footer#main-footer > div > div:last-child {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #777;
+            padding-top: 10px; /* Small padding from border */
+        }
+        footer#main-footer > div > div:last-child > div:last-child {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        footer#main-footer > div > div:last-child > div:last-child span:nth-child(2) {
+            width: 5px;
+            height: 5px;
+            background-color: #555;
+            border-radius: 50%;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) { /* Tablet breakpoint */
+            div[role="group"] { /* Project cards */
+                flex: 0 0 clamp(280px, calc(50% - 15px), 360px); /* 2 cards on tablet */
+            }
+            section:nth-child(5) > div:first-child > div { /* CTA flex container */
+                gap: 30px;
+            }
+            section:nth-child(5) > div:first-child > div > div:last-child { /* CTA Right column */
+                padding-left: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header nav {
+                display: none; /* Hidden by default, shown by JS/checkbox hack if implemented */
+                /* Basic mobile menu styling if it were to be shown */
+                position: absolute;
+                top: 100%; /* Below header */
+                left: 0;
+                width: 100%;
+                background-color: var(--bg-color);
+                flex-direction: column;
+                padding: 10px 0;
+                border-top: 1px solid rgba(255,255,255,0.1);
+                box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            }
+            header nav a { padding: 12px 5%; text-align: center; }
+            header nav a span { left: 50%; transform: translateX(-50%); }
+            header nav a:hover span, header nav a[href="/"] span { width: 30%; }
+
+            header div:last-child button { display: flex; align-items: center; justify-content: center; }
+
+            main { padding-top: 70px; }
+
+            main section:first-child h1 { font-size: clamp(2.5rem, 13vw, 4rem); letter-spacing: -0.02em; }
+            main section:first-child div > p { font-size: clamp(0.95rem, 4vw, 1.15rem); max-width: 90%; }
+
+            section:nth-child(2) { padding: 60px 5%; }
+            section:nth-child(2) h2 { font-size: clamp(2rem, 7vw, 2.6rem); }
+            div[role="group"] { flex: 0 0 80vw; } /* Wider cards, one mostly visible */
+            div[role="region"] > div { gap: 20px; }
+
+
+            section:nth-child(3) { padding: 60px 0; }
+            section:nth-child(3)::before, section:nth-child(3)::after { width: 50px; } /* Smaller fade on mobile */
+            section:nth-child(3) span { font-size: clamp(1.5rem, 6vw, 2.2rem); padding: 0 20px; }
+            section:nth-child(3) > div > div { animation-duration: 50s; }
+            section:nth-child(3) > div:nth-child(2) > div { animation-duration: 50s; }
+
+            section:nth-child(4) { padding: 80px 5%; background-attachment: scroll; }
+            section:nth-child(4) blockquote p { font-size: clamp(1.3rem, 5vw, 2rem); }
+
+            section:nth-child(5) { padding: 80px 5%; }
+            section:nth-child(5) > div:first-child > div { flex-direction: column; gap: 50px; }
+            section:nth-child(5) > div:first-child > div > div:first-child { padding-right: 0; text-align: center; }
+            section:nth-child(5) h2 { text-align: center; }
+            section:nth-child(5) h2 span { display: inline; }
+            section:nth-child(5) > div:first-child > div > div:first-child > div:first-of-type { max-width: 100%; }
+            section:nth-child(5) > div:first-child > div > div:first-child > div:last-of-type { justify-content: center; }
+            section:nth-child(5) > div:first-child > div > div:last-child { padding-left: 0; align-items: center; text-align: center; }
+            section:nth-child(5) > div:first-child > div > div:last-child > div:nth-child(1),
+            section:nth-child(5) > div:first-child > div > div:last-child > div:nth-child(2),
+            section:nth-child(5) > div:first-child > div > div:last-child > div:nth-child(3) { display: none; }
+
+            body > div:nth-last-of-type(2) { padding: 30px 5%; }
+            body > div:nth-last-of-type(2) > div > div { flex-direction: column; text-align: center; gap: 25px; }
+            body > div:nth-last-of-type(2) > div > div > div:first-child { flex-direction: column; gap: 15px; }
+            body > div:nth-last-of-type(2) > div > div > div:first-child > div:last-child { justify-content: center; }
+
+            footer#main-footer { padding: 50px 5% 20px; }
+            footer#main-footer > div > div:first-child { grid-template-columns: 1fr; text-align: center; gap: 30px; margin-bottom: 30px; padding-bottom: 30px; }
+            footer nav a, footer > div > div:first-child > div:first-child a { justify-content: center; }
+            footer nav a span span { left: 50%; transform: translateX(-50%); }
+            footer nav a:hover span span { width: 20%; }
+            footer > div > div:first-child > div:last-child > div:first-of-type { justify-content: center; }
+            footer#main-footer > div > div:last-child { flex-direction: column; text-align: center; }
+        }
+
+    </style>
+</head>
+<body>
+    <div> <!-- Main wrapper div from provided HTML -->
+        <header>
+            <div>
+                <a href="/">MC</a>
+                <nav>
+                    <a href="/">Home<span></span></a>
+                    <a href="/projects">Projects<span></span></a>
+                    <a href="/about">About<span></span></a>
+                    <a href="/experience">Experience<span></span></a>
+                    <a href="/contact">Contact<span></span></a>
+                </nav>
+                <div>
+                    <button aria-label="Open navigation menu" type="button">
+                        <span></span> <!-- For hamburger icon middle bar -->
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main>
+            <section> <!-- Hero Section -->
+                <div>
+                    <h1>
+                        <span>H</span><span>E</span><span>L</span><span>L</span><span>O</span><span>,</span>
+                        <span> </span> <!-- Space -->
+                        <span>I</span><span>T</span><span>'</span><span>S</span>
+                        <span> </span> <!-- Space -->
+                        <span>M</span><span>E</span>
+                    </h1>
+                    <div>
+                        <p>Creative designer crafting digital experiences that blend brutalist aesthetics with cinematic storytelling</p>
+                        <div>
+                            <span>Scroll to explore</span>
+                            <div></div> <!-- Mouse icon placeholder -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section> <!-- Featured Work Section -->
+                <div>
+                    <div>
+                        <h2>Featured Work</h2>
+                        <p>A curated selection of projects showcasing design excellence and technical innovation.</p>
+                    </div>
+                    <div role="region"> <!-- Carousel container -->
+                        <div> <!-- Inner container for slides -->
+                            <div role="group">
+                                <div aria-labelledby="project-title-1" role="article">
+                                    <div>
+                                        <img alt="Mobile banking app interface" src="placeholder-project-1.jpg"/>
+                                        <div></div> <!-- Gradient Overlay -->
+                                        <div>
+                                            <div>
+                                                <div>
+                                                    <span>Mobile App</span><span>FinTech</span><span>UI/UX</span>
+                                                </div>
+                                                <h3 id="project-title-1">Nexus Mobile Banking</h3>
+                                                <p>Complete mobile banking experience with biometric authentication and intuitive financial management.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="group">
+                                <div aria-labelledby="project-title-2" role="article">
+                                    <div>
+                                        <img alt="Brand identity design materials" src="placeholder-project-2.jpg"/>
+                                        <div></div> <!-- Gradient Overlay -->
+                                        <div>
+                                            <div>
+                                                <div>
+                                                    <span>Branding</span><span>Identity</span><span>Sustainability</span>
+                                                </div>
+                                                <h3 id="project-title-2">Verdant Brand Identity</h3>
+                                                <p>Sustainable lifestyle brand focusing on eco-friendly products with organic visual language.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="group">
+                                <div aria-labelledby="project-title-3" role="article">
+                                    <div>
+                                        <img alt="Creative studio website design" src="placeholder-project-3.jpg"/>
+                                        <div></div> <!-- Gradient Overlay -->
+                                        <div>
+                                            <div>
+                                                <div>
+                                                    <span>Web Development</span><span>Portfolio</span><span>Motion</span>
+                                                </div>
+                                                <h3 id="project-title-3">Atlas Creative Studio</h3>
+                                                <p>Portfolio website for creative agency showcasing immersive storytelling and bold visual narratives.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="group">
+                                <div aria-labelledby="project-title-4" role="article">
+                                    <div>
+                                        <img alt="Music platform interface" src="placeholder-project-4.jpg"/>
+                                        <div></div> <!-- Gradient Overlay -->
+                                        <div>
+                                            <div>
+                                                <div>
+                                                    <span>Web App</span><span>Music</span><span>Social</span>
+                                                </div>
+                                                <h3 id="project-title-4">Rhythm Music Platform</h3>
+                                                <p>Social music discovery platform connecting artists and listeners through curated experiences.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="group">
+                                <div aria-labelledby="project-title-5" role="article">
+                                    <div>
+                                        <img alt="E-commerce platform design" src="placeholder-project-5.jpg"/>
+                                        <div></div> <!-- Gradient Overlay -->
+                                        <div>
+                                            <div>
+                                                <div>
+                                                    <span>E-commerce</span><span>AR</span><span>Mobile</span>
+                                                </div>
+                                                <h3 id="project-title-5">Orbit E-commerce</h3>
+                                                <p>Next-generation shopping experience with AR try-on features and personalized recommendations.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div> <!-- Carousel navigation buttons -->
+                        <button><span>Previous slide</span></button>
+                        <button><span>Next slide</span></button>
+                    </div>
+                </div>
+            </section>
+            <section> <!-- Skills Marquee Section -->
+                <div> <!-- First marquee row -->
+                    <div> <!-- Inner scrolling div -->
+                        <span>Brand Design</span><span>UI/UX Design</span><span>Motion Graphics</span><span>Full-Stack Development</span><span>Creative Direction</span><span>Visual Identity</span><span>Web Development</span><span>Digital Strategy</span><span>Product Design</span><span>Interactive Design</span><span>Graphic Design</span><span>Frontend Development</span>
+                        <span>Brand Design</span><span>UI/UX Design</span><span>Motion Graphics</span><span>Full-Stack Development</span><span>Creative Direction</span><span>Visual Identity</span><span>Web Development</span><span>Digital Strategy</span><span>Product Design</span><span>Interactive Design</span><span>Graphic Design</span><span>Frontend Development</span>
+                    </div>
+                </div>
+                <div> <!-- Second marquee row -->
+                    <div> <!-- Inner scrolling div -->
+                        <span>Art Direction</span><span>User Experience</span><span>Animation</span><span>React Development</span><span>Typography</span><span>Prototyping</span><span>Backend Development</span><span>Design Systems</span><span>Branding</span><span>Mobile Design</span><span>Print Design</span><span>Content Strategy</span>
+                        <span>Art Direction</span><span>User Experience</span><span>Animation</span><span>React Development</span><span>Typography</span><span>Prototyping</span><span>Backend Development</span><span>Design Systems</span><span>Branding</span><span>Mobile Design</span><span>Print Design</span><span>Content Strategy</span>
+                    </div>
+                </div>
+                <div></div> <!-- Empty div from HTML, ignored in CSS -->
+                <div></div> <!-- Empty div from HTML, ignored in CSS -->
+            </section>
+            <section> <!-- Testimonial Section -->
+                <div></div> <!-- Empty div from HTML -->
+                <div></div> <!-- Empty div from HTML -->
+                <div></div> <!-- Empty div from HTML -->
+                <div> <!-- Content wrapper for testimonial -->
+                    <div> <!-- Actual content -->
+                        <blockquote>
+                            <p>"Working with this designer was an absolute game-changer. Their attention to detail and creative vision transformed our brand into something truly extraordinary."</p>
+                        </blockquote>
+                        <div>
+                            <cite>Sarah Chen</cite>
+                            <p>Creative Director, Stellar Studios</p>
+                        </div>
+                        <div> <!-- Decorative element container -->
+                            <div></div> <!-- Decorative line -->
+                        </div>
+                    </div>
+                </div>
+                <div> <!-- Container for two empty divs, ignored -->
+                    <div></div>
+                    <div></div>
+                </div>
+            </section>
+            <section> <!-- Let's Build Together CTA Section -->
+                <div> <!-- Main container for this section -->
+                    <div> <!-- Flex/grid container for columns -->
+                        <div> <!-- Left column wrapper -->
+                            <div> <!-- Inner wrapper for left column content -->
+                                <div> <!-- Text content block -->
+                                    <h2>Let's Build<br/><span>Together</span></h2>
+                                    <div> <!-- Paragraphs wrapper -->
+                                        <p>Ready to bring your vision to life? I'm passionate about creating digital experiences that make a lasting impact.</p>
+                                        <p>Whether it's a complete brand overhaul, a cutting-edge web application, or an innovative digital product — let's collaborate and build something extraordinary.</p>
+                                    </div>
+                                    <div> <!-- Buttons wrapper -->
+                                        <a aria-label="Send email to start a project" href="mailto:hello@example.com">Start a Project</a>
+                                        <a aria-label="View full contact page" href="/contact">Let's Talk</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div> <!-- Right column wrapper (stats and decorative) -->
+                            <div></div> <!-- Decorative element 1 -->
+                            <div></div> <!-- Decorative element 2 -->
+                            <div></div> <!-- Decorative element 3 -->
+                            <div> <!-- Stat 1 -->
+                                <div>50+</div>
+                                <div>Projects Delivered</div>
+                            </div>
+                            <div> <!-- Stat 2 -->
+                                <div>5★</div>
+                                <div>Client Rating</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div></div> <!-- Empty div from HTML, ignored -->
+                <div></div> <!-- Empty div from HTML, ignored -->
+                <div></div> <!-- Empty div from HTML, ignored -->
+                <div></div> <!-- Empty div from HTML, ignored -->
+            </section>
+        </main>
+        <div> <!-- Pre-Footer Contact Bar -->
+            <div>
+                <div> <!-- Inner container -->
+                    <div> <!-- Left side: Text and contact details -->
+                        <div>Let's Build Together</div>
+                        <div>
+                            <a aria-label="Send email" href="mailto:hello@example.com"><span>hello@example.com</span></a>
+                            <a aria-label="Call phone number" href="tel:+1234567890"><span>+1 (234) 567-890</span></a>
+                        </div>
+                    </div>
+                    <div> <!-- Right side: Social icons -->
+                        <a aria-label="Visit LinkedIn profile" href="#"><span>LI</span></a>
+                        <a aria-label="Visit GitHub profile" href="#"><span>GH</span></a>
+                        <a aria-label="Visit Twitter profile" href="#"><span>TW</span></a>
+                        <a aria-label="Visit Dribbble profile" href="#"><span>DR</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer id="main-footer">
+            <div> <!-- Main footer container -->
+                <div> <!-- Top part of footer (columns) -->
+                    <div> <!-- Column 1: Modernist, description, contacts -->
+                        <h3>MODERNIST</h3>
+                        <p>Crafting digital experiences with cinematic brutal-elegance and contemporary code-native design.</p>
+                        <div>
+                            <a href="mailto:hello@example.com"><span>hello@example.com</span></a>
+                            <a href="tel:+1234567890"><span>+1 (234) 567-890</span></a>
+                        </div>
+                    </div>
+                    <div> <!-- Column 2: Navigation -->
+                        <h4>Navigation</h4>
+                        <nav>
+                            <a href="/projects"><span>Projects<span></span></span></a>
+                            <a href="/about"><span>About<span></span></span></a>
+                            <a href="/experience"><span>Experience<span></span></span></a>
+                            <a href="/contact"><span>Contact<span></span></span></a>
+                        </nav>
+                    </div>
+                    <div> <!-- Column 3: Services -->
+                        <h4>Services</h4>
+                        <div>
+                            <div>Brand Design</div>
+                            <div>UI/UX Design</div>
+                            <div>Motion Graphics</div>
+                            <div>Development</div>
+                            <div>Consulting</div>
+                        </div>
+                    </div>
+                    <div> <!-- Column 4: Connect -->
+                        <h4>Connect</h4>
+                        <div> <!-- Social icons -->
+                            <a aria-label="Visit LinkedIn profile" href="#"><span>LI</span></a>
+                            <a aria-label="Visit GitHub profile" href="#"><span>GH</span></a>
+                            <a aria-label="Visit Twitter profile" href="#"><span>TW</span></a>
+                            <a aria-label="Visit Dribbble profile" href="#"><span>DR</span></a>
+                        </div>
+                        <div> <!-- Privacy, Terms -->
+                            <a href="/privacy">Privacy Policy</a>
+                            <a href="/terms">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+                <div> <!-- Bottom part of footer (Copyright) -->
+                    <div>© 2025 Modernist Canvas. All rights reserved.</div>
+                    <div>
+                        <span>Made with precision</span>
+                        <span></span> <!-- Separator dot -->
+                        <span>Powered by creativity</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- <next-route-announcer></next-route-announcer> Removed as it's framework specific -->
+</body>
+</html>

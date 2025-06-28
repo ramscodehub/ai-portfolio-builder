@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Scraper Context Viewer</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px 40px; background-color: #f4f4f9; color: #333; }
+        h1, h2 { color: #1a1a1a; }
+        #container { max-width: 1200px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        #urlInput { flex-grow: 1; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        #fetchContextButton { padding: 12px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        #fetchContextButton:hover { background-color: #0056b3; }
+        #fetchContextButton:disabled { background-color: #aaa; cursor: not-allowed; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: none; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .output { margin-top: 30px; }
+        .output-section { margin-bottom: 30px; }
+        .screenshot-container { text-align: center; }
+        img { max-width: 100%; border: 2px solid #333; margin-top: 10px; background-color: #eee; }
+        #htmlContentOutput {
+            background-color: #2d2d2d; color: #f0f0f0; border: 1px solid #444; padding: 15px;
+            margin-top: 10px; max-height: 600px; overflow-y: auto; white-space: pre-wrap;
+            word-break: break-all; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            font-size: 0.85em; border-radius: 4px;
+        }
+        #error { color: #d9534f; font-weight: bold; margin-top: 20px; }
+        hr { margin: 40px 0; border: 0; border-top: 1px solid #ddd; }
+        .status-message { font-style: italic; color: #555; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Website Scraper Context Viewer</h1>
+        <p>Enter a URL to fetch its design context (screenshots and cleaned HTML).</p>
+        
+        <div class="input-group">
+            <input type="url" id="urlInput" placeholder="https://example.com" value="https://www.uber.com">
+            <button id="fetchContextButton">Fetch Context</button>
+        </div>
+
+        <div id="loading" class="loader"></div>
+        <div id="statusMessage" class="status-message"></div>
+        <div id="error"></div>
+        
+        <div id="results" class="output" style="display: none;">
+            <div class="output-section">
+                <h2>Original URL</h2>
+                <p id="originalUrlOutput"></p>
+            </div>
+            <hr>
+            <div class="output-section screenshot-container">
+                <h2>Desktop Screenshot</h2>
+                <img id="desktopImg" alt="Desktop Screenshot">
+            </div>
+            <hr>
+            <div class="output-section screenshot-container">
+                <h2>Mobile Screenshot</h2>
+                <img id="mobileImg" alt="Mobile Screenshot">
+            </div>
+            <hr>
+            <div class="output-section">
+                <h2>Cleaned HTML Content</h2>
+                <pre id="htmlContentOutput">HTML content will appear here...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const fetchContextButton = document.getElementById('fetchContextButton');
+        const loadingSpinner = document.getElementById('loading');
+        const resultsDiv = document.getElementById('results');
+        const errorDiv = document.getElementById('error');
+        const statusMessageEl = document.getElementById('statusMessage');
+        
+        const originalUrlOutputEl = document.getElementById('originalUrlOutput');
+        const desktopImgEl = document.getElementById('desktopImg');
+        const mobileImgEl = document.getElementById('mobileImg');
+        const htmlOutputEl = document.getElementById('htmlContentOutput');
+
+        fetchContextButton.addEventListener('click', async () => {
+            const url = urlInput.value;
+            if (!url) { alert('Please enter a valid URL.'); return; }
+
+            fetchContextButton.disabled = true;
+            loadingSpinner.style.display = 'block';
+            resultsDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            statusMessageEl.textContent = 'Fetching website context...';
+            
+            if(originalUrlOutputEl) originalUrlOutputEl.textContent = '';
+            if(desktopImgEl) desktopImgEl.src = '#';
+            if(mobileImgEl) mobileImgEl.src = '#';
+            if(htmlOutputEl) htmlOutputEl.textContent = 'Loading...';
+
+            try {
+                const response = await fetch('http://localhost:8000/get-scraped-context', { // New endpoint
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url }),
+                });
+
+                statusMessageEl.textContent = 'Processing context...';
+
+                if (!response.ok) {
+                    let errorMsg = `HTTP error! status: ${response.status}`;
+                    try { const errorData = await response.json(); errorMsg = errorData.detail || errorMsg; }
+                    catch (e) { console.warn("Could not parse error response as JSON:", e); }
+                    throw new Error(errorMsg);
+                }
+
+                const data = await response.json(); // Expects ScrapedContextResponse
+
+                if(originalUrlOutputEl) originalUrlOutputEl.textContent = data.original_url || 'N/A';
+                if(desktopImgEl && data.desktop_screenshot_base64) {
+                    desktopImgEl.src = `data:image/png;base64,${data.desktop_screenshot_base64}`;
+                } else if (desktopImgEl) {
+                    desktopImgEl.alt = "Desktop screenshot not available";
+                }
+                if(mobileImgEl && data.mobile_screenshot_base64) {
+                    mobileImgEl.src = `data:image/png;base64,${data.mobile_screenshot_base64}`;
+                } else if (mobileImgEl) {
+                    mobileImgEl.alt = "Mobile screenshot not available";
+                }
+                if(htmlOutputEl) {
+                    htmlOutputEl.textContent = data.simplified_html || 'No HTML content received or HTML extraction failed.';
+                }
+                
+                resultsDiv.style.display = 'block';
+                statusMessageEl.textContent = 'Context loaded successfully!';
+
+            } catch (error) {
+                console.error('Error fetching context:', error);
+                errorDiv.textContent = `An error occurred: ${error.message}`;
+                statusMessageEl.textContent = 'Failed to fetch context.';
+                if(htmlOutputEl) htmlOutputEl.textContent = 'Failed to load HTML content.';
+            } finally {
+                loadingSpinner.style.display = 'none';
+                fetchContextButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

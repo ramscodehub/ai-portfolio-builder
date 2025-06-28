@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Clone</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Uber Move Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #000;
+            background-color: #fff;
+            line-height: 1.6;
+        }
+
+        /* Fallback for Uber Move fonts if not available */
+        @font-face {
+            font-family: 'Uber Move Text';
+            src: local('Uber Move Text Regular'), local('UberMoveText-Regular'),
+                 url('https://uber-common.s3.amazonaws.com/web-fonts/UberMoveText-Regular.woff2') format('woff2'),
+                 url('https://uber-common.s3.amazonaws.com/web-fonts/UberMoveText-Regular.woff') format('woff');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Uber Move Display';
+            src: local('Uber Move Display Medium'), local('UberMoveDisplay-Medium'),
+                 url('https://uber-common.s3.amazonaws.com/web-fonts/UberMoveDisplay-Medium.woff2') format('woff2'),
+                 url('https://uber-common.s3.amazonaws.com/web-fonts/UberMoveDisplay-Medium.woff') format('woff');
+            font-weight: 500; /* Medium weight */
+            font-style: normal;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: "Uber Move Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 500; /* Medium for Uber Move Display */
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: inherit;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        input[type="text"], input[type="combobox"] {
+            font-family: inherit;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 0; /* Uber inputs are often sharp */
+            background-color: #f6f6f6;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        input::placeholder {
+            color: #545454;
+        }
+
+        #root > div > div > div > a[href="#main"] {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        #root > div > div > div > a[href="#main"]:focus {
+            position: static;
+            width: auto;
+            height: auto;
+            overflow: auto;
+            padding: 10px;
+            background-color: #eee;
+            color: #000;
+            z-index: 10000;
+        }
+
+        /* Desktop Header */
+        header.desktop-header {
+            background-color: #000;
+            color: #fff;
+            padding: 0 24px;
+            height: 72px;
+        }
+        header.desktop-header > div {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 1280px; /* Approx max width */
+            margin: 0 auto;
+        }
+        header.desktop-header nav > div {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        header.desktop-header .uber-logo a {
+            font-family: "Uber Move Display", sans-serif;
+            font-size: 28px;
+            font-weight: 700; /* Bold for logo */
+            color: #fff;
+        }
+
+        header.desktop-header ul {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        header.desktop-header ul li {
+            position: relative;
+        }
+        header.desktop-header ul li a,
+        header.desktop-header ul li button {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        header.desktop-header ul li button div { /* Arrow placeholder */
+            margin-left: 6px;
+            font-size: 10px;
+        }
+        header.desktop-header ul li button div::after {
+            content: '▼';
+        }
+
+        /* Desktop Nav Dropdowns */
+        header.desktop-header ul li > div { /* Dropdown container */
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 100;
+            padding: 8px 0;
+            border-radius: 4px;
+        }
+        header.desktop-header ul li:hover > div,
+        header.desktop-header ul li button:focus + div,
+        header.desktop-header ul li > div:focus-within {
+            display: block;
+        }
+        header.desktop-header ul li > div ul li a,
+        header.desktop-header ul li > div ul li div { /* For non-link items like "Explore" */
+            color: #000;
+            padding: 10px 20px;
+            display: block;
+            font-size: 14px;
+            white-space: nowrap;
+            height: auto;
+        }
+         header.desktop-header ul li > div ul li a:hover {
+            background-color: #f6f6f6;
+        }
+        /* Nested dropdowns (basic styling) */
+        header.desktop-header ul li > div ul li ul {
+            /* Basic styling for nested lists if they were to appear */
+            padding-left: 20px;
+        }
+        header.desktop-header ul li > div ul li[aria-label*="nested listbox"] > div {
+            display: flex;
+            justify-content: space-between;
+        }
+        header.desktop-header ul li > div ul li[aria-label*="nested listbox"] > div > div:last-child::after {
+            content: '▶';
+            font-size: 10px;
+            margin-left: 8px;
+        }
+
+
+        /* Right side of desktop nav */
+        header.desktop-header nav > div > ul:last-of-type > li > div[role="button"] { /* Search clear button */
+            display: none; /* Not clearly visible or styled in screenshot */
+        }
+        header.desktop-header nav > div > ul:last-of-type > li:first-child > div { /* Search container */
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            border-radius: 30px;
+            padding: 0 8px 0 12px;
+            margin-right: 8px;
+        }
+        header.desktop-header nav > div > ul:last-of-type > li:first-child > div > div:first-child::before { /* Search icon */
+            content: '🔍';
+            font-size: 16px;
+            margin-right: 8px;
+            color: #fff;
+        }
+        header.desktop-header nav > div > ul:last-of-type > li:first-child input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            padding: 10px 0;
+            font-size: 14px;
+            width: 150px; /* Approximate */
+        }
+        header.desktop-header nav > div > ul:last-of-type > li:first-child input::placeholder {
+            color: #ccc;
+        }
+
+        header.desktop-header .lang-button button > div:first-child::before { /* Globe icon */
+            content: '🌐';
+            margin-right: 6px;
+            font-size: 16px;
+        }
+
+        header.desktop-header .signup-button button {
+            background-color: #fff;
+            color: #000;
+            border-radius: 20px;
+            padding: 8px 16px !important; /* Override general padding */
+            height: auto;
+            font-weight: 500;
+        }
+        header.desktop-header .signup-button > div { /* Signup dropdown */
+            left: auto;
+            right: 0;
+        }
+        header.desktop-header .signup-button > div > div a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header.desktop-header .signup-button > div > div a > div:last-child > div::after { /* Arrow right */
+            content: '→';
+            font-size: 16px;
+        }
+
+
+        /* Mobile Header */
+        header.mobile-header {
+            background-color: #000;
+            color: #fff;
+            padding: 0 16px;
+            height: 56px;
+            display: none; /* Hidden by default */
+        }
+        header.mobile-header > div {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+        header.mobile-header .uber-logo a {
+            font-family: "Uber Move Display", sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+        header.mobile-header ul {
+            display: flex;
+            align-items: center;
+        }
+        header.mobile-header ul li button,
+        header.mobile-header ul li a {
+            padding: 8px;
+            font-size: 14px;
+            color: #fff;
+        }
+        header.mobile-header .search-btn button div:first-child::before {
+            content: '🔍';
+            font-size: 20px;
+        }
+        header.mobile-header .signup-btn button {
+            background-color: #fff;
+            color: #000;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-weight: 500;
+        }
+        header.mobile-header .menu-btn button::before {
+            content: '☰';
+            font-size: 24px;
+        }
+
+        /* Main content */
+        main {
+            padding-top: 0; /* Header is not fixed by default in this structure */
+        }
+
+        /* Hero Section */
+        .hero-section-wrapper {
+            background-color: #fff; /* White background for the content area */
+        }
+        .hero-section-container {
+            display: flex;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px; /* Match header padding */
+        }
+        .hero-section-content {
+            flex: 1 1 55%; /* Adjust ratio as needed */
+            padding: 48px 0;
+        }
+        .hero-section-image-placeholder {
+            flex: 1 1 45%;
+            background-color: #f0f0f0; /* Placeholder for image area */
+            background-image: url('https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_1698,h_828/v1684852612/assets/ba/05222b-0529-4588-9838-090f7093a052/original/UberX-%281%29.png'); /* Placeholder image */
+            background-size: cover;
+            background-position: center;
+            min-height: 500px; /* Ensure it has some height */
+        }
+        .hero-section-content h1 {
+            font-size: 52px;
+            font-weight: 700; /* Bold for Uber Move Display */
+            line-height: 1.1;
+            margin-bottom: 32px;
+            color: #000;
+        }
+        .hero-form .input-group {
+            position: relative;
+            margin-bottom: 8px;
+            display: flex; /* For icon + input */
+            align-items: center;
+            background-color: #f6f6f6;
+            padding: 0 16px;
+        }
+         .hero-form .input-group > div:first-child { /* Icon placeholder */
+            margin-right: 12px;
+            font-size: 20px;
+            color: #545454;
+        }
+        .hero-form .input-wrapper {
+            flex-grow: 1;
+            position: relative;
+            padding: 8px 0;
+        }
+        .hero-form .input-wrapper input {
+            background-color: transparent;
+            border: none;
+            padding: 18px 0 6px 0; /* Space for label */
+            font-size: 16px;
+        }
+        .hero-form .input-wrapper > div:nth-of-type(2) { /* Label */
+            position: absolute;
+            top: 18px; /* Initial position */
+            left: 0;
+            color: #545454;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+        .hero-form .input-wrapper input:focus + div,
+        .hero-form .input-wrapper input:not(:placeholder-shown) + div { /* Crude :not(:placeholder-shown) might need JS for robustness */
+            top: 6px;
+            font-size: 12px;
+        }
+         .hero-form .input-group > div:last-child:not(.input-wrapper) { /* Trailing icon */
+            font-size: 20px;
+            color: #545454;
+            cursor: pointer;
+        }
+        .hero-form .date-time-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .hero-form .date-time-group > div {
+            flex: 1;
+        }
+        .hero-form .date-time-group input {
+            padding-left: 40px; /* Space for icon */
+        }
+        .hero-form .date-time-group .input-group > div:first-child { /* Icon for date/time */
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .hero-form .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .hero-form .actions a[href*="m.uber.com/looking"],
+        .hero-form .actions button { /* Assuming See Prices could be a button */
+            background-color: #000;
+            color: #fff;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .hero-form .actions a[href*="auth.uber.com"] {
+            color: #000;
+            text-decoration: underline;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Suggestions Section */
+        .suggestions-section {
+            padding: 48px 24px;
+            background-color: #fff;
+        }
+        .suggestions-section-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        .suggestions-section h2 {
+            font-size: 24px;
+            margin-bottom: 24px;
+        }
+        .suggestions-section ul {
+            display: flex;
+            gap: 16px;
+        }
+        .suggestions-section ul li {
+            flex: 1;
+            background-color: #f0f0f0;
+            height: 120px; /* Approximate */
+            border-radius: 8px;
+        }
+        /* Hide other suggestion sections from HTML */
+        main > div:nth-child(4) > div > div > section:not(:first-of-type) { display: none; }
+
+
+        /* Content Sections (Image + Text) */
+        .content-section {
+            padding: 64px 24px;
+        }
+        .content-section-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 48px;
+        }
+        .content-section-inner.reverse {
+            flex-direction: row-reverse;
+        }
+        .content-section .text-content {
+            flex: 1;
+        }
+        .content-section .image-content {
+            flex: 1;
+        }
+        .content-section .image-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px; /* If images have rounded corners */
+        }
+        .content-section h2 {
+            font-size: 36px;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+        .content-section p {
+            font-size: 16px;
+            margin-bottom: 24px;
+            color: #545454;
+        }
+        .content-section .actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .content-section .actions a:first-child {
+            background-color: #000;
+            color: #fff;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        .content-section .actions a:last-child span {
+            font-size: 14px;
+            text-decoration: underline;
+            color: #000;
+        }
+
+        /* "It's easier in the apps" Section */
+        .apps-section {
+            padding: 64px 24px;
+            background-color: #f6f6f6;
+        }
+        .apps-section-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        .apps-section h2 {
+            font-size: 36px;
+            margin-bottom: 32px;
+        }
+        .apps-cards-container {
+            display: flex;
+            gap: 24px;
+        }
+        .app-card {
+            flex: 1;
+            background-color: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-card > div:first-child img { /* QR code image */
+            width: 100px; /* Adjust as needed */
+            height: 100px;
+            display: block;
+        }
+        .app-card .app-info h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .app-card .app-info p {
+            font-size: 14px;
+            color: #545454;
+        }
+        .app-card > div:last-child::after { /* Arrow icon */
+            content: '→';
+            font-size: 24px;
+            color: #000;
+        }
+        /* Hide mobile version of apps section on desktop */
+        main > div:nth-child(10) > div > div:first-child > section { display: none; }
+
+
+        /* Footer */
+        footer {
+            background-color: #000;
+            color: #fff;
+            padding: 64px 24px 24px;
+        }
+        footer section > div > div { /* .footer-inner */
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+        .footer-logo-help a:first-child { /* Uber logo */
+            font-family: "Uber Move Display", sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 24px;
+        }
+        .footer-logo-help a:last-child p {
+            font-size: 16px;
+        }
+        .footer-links {
+            display: flex;
+            gap: 48px; /* Gap between columns */
+            flex-wrap: wrap;
+        }
+        .footer-links > div > div > div { /* Column title */
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        .footer-links ul li a p {
+            font-size: 14px;
+            color: #fff;
+            padding: 6px 0;
+            display: block;
+        }
+        .footer-links ul li a:hover p {
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 32px;
+            border-top: 1px solid #333;
+            flex-wrap: wrap;
+        }
+        .footer-social-lang {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .footer-social-lang ul {
+            display: flex;
+            gap: 16px;
+        }
+        .footer-social-lang ul li a { /* Social icon placeholder */
+            font-size: 20px; /* Placeholder size */
+            width: 24px; height: 24px; display: inline-block; text-align: center;
+        }
+        /* Placeholder social icons */
+        .footer-social-lang ul li:nth-child(1) a::before { content: 'FB'; font-size: 12px; }
+        .footer-social-lang ul li:nth-child(2) a::before { content: 'TW'; font-size: 12px; }
+        .footer-social-lang ul li:nth-child(3) a::before { content: 'YT'; font-size: 12px; }
+        .footer-social-lang ul li:nth-child(4) a::before { content: 'LI'; font-size: 12px; }
+        .footer-social-lang ul li:nth-child(5) a::before { content: 'IG'; font-size: 12px; }
+
+        .footer-social-lang > ul:last-of-type li button { /* Lang/Location buttons */
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .footer-social-lang > ul:last-of-type li button div::before { /* Icon */
+            margin-right: 8px;
+        }
+        .footer-social-lang > ul:last-of-type li:first-child button div::before { content: '🌐'; }
+        .footer-social-lang > ul:last-of-type li:last-child button div::before { content: '📍'; }
+
+        .footer-app-badges div {
+            display: flex;
+            gap: 16px;
+        }
+        .footer-app-badges img {
+            height: 40px;
+        }
+
+        .footer-legal {
+            padding-top: 32px;
+            margin-top: 32px;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #ccc;
+            flex-wrap: wrap;
+        }
+        .footer-legal ul {
+            display: flex;
+            gap: 24px;
+        }
+        .footer-legal ul li a p {
+            color: #ccc;
+        }
+        .footer-legal ul li a:hover p {
+            text-decoration: underline;
+        }
+
+        /* Mobile Menu Panel (initially hidden or off-screen) */
+        .mobile-menu-panel {
+            position: fixed;
+            top: 0;
+            left: 0; /* Set to 0 to show, -100% to hide */
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 16px;
+            box-sizing: border-box;
+            display: none; /* Controlled by JS, shown here for styling if active */
+        }
+        .mobile-menu-panel .close-btn button {
+            font-size: 24px;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+        .mobile-menu-panel .close-btn button::before { content: '✕'; }
+        .mobile-menu-panel h2, .mobile-menu-panel h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        .mobile-menu-panel > div > div > a, /* Language links */
+        .mobile-menu-panel ul[role="tree"] li a,
+        .mobile-menu-panel ul[role="tree"] li p { /* For non-link items like Explore */
+            display: block;
+            padding: 12px 0;
+            font-size: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .mobile-menu-panel ul[role="tree"] li ul { padding-left: 16px; }
+        .mobile-menu-panel ul[role="tree"] li > div > div { display: flex; justify-content: space-between; align-items: center; }
+        .mobile-menu-panel ul[role="tree"] li > div > div > div::after { content: '›'; font-size: 16px; } /* Chevron */
+
+        .mobile-menu-panel .lang-select-mobile button {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            padding: 12px 0;
+            width: 100%;
+            border-top: 1px solid #eee;
+            margin-top: 16px;
+        }
+        .mobile-menu-panel .lang-select-mobile button div::before { content: '🌐'; margin-right: 8px; }
+
+        .mobile-menu-panel section h2 { font-size: 16px; margin-top: 24px; }
+        .mobile-menu-panel section a {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .mobile-menu-panel section a h2 { font-size: 16px; margin: 0; flex-grow: 1; }
+        .mobile-menu-panel section a p::after { content: '→'; font-size: 16px; } /* Arrow */
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) { /* Tablet and below */
+            .hero-section-content h1 { font-size: 40px; }
+            .content-section h2 { font-size: 30px; }
+            .apps-section h2 { font-size: 30px; }
+            .apps-cards-container { flex-direction: column; }
+            .footer-links { gap: 24px; }
+            .footer-links > div { flex-basis: calc(50% - 12px); } /* Two columns */
+        }
+
+        @media (max-width: 768px) { /* Mobile */
+            header.desktop-header { display: none; }
+            header.mobile-header { display: block; }
+            /* If mobile menu is to be shown when mobile header is active: */
+            /* .mobile-menu-panel { display: block; left: 0; } */
+
+
+            .hero-section-container { flex-direction: column; padding: 0; }
+            .hero-section-content { padding: 24px 16px; }
+            .hero-section-image-placeholder { display: none; /* Image often removed or stacked on mobile */ }
+            .hero-section-content h1 { font-size: 32px; }
+            
+            .suggestions-section { padding: 32px 16px; }
+            .suggestions-section ul { flex-direction: column; }
+            .suggestions-section ul li { height: 80px; }
+
+            .content-section { padding: 32px 16px; }
+            .content-section-inner, .content-section-inner.reverse {
+                flex-direction: column;
+            }
+            .content-section-inner.reverse .image-content { order: -1; } /* Image on top for reversed */
+            .content-section h2 { font-size: 24px; }
+            .content-section p { font-size: 15px; }
+            .content-section .actions { flex-direction: column; align-items: stretch; }
+            .content-section .actions a:first-child,
+            .content-section .actions a:last-child {
+                text-align: center;
+            }
+             .content-section .actions a:last-child span { display: block; }
+
+
+            .apps-section { padding: 32px 16px; }
+            .apps-section h2 { font-size: 24px; }
+            /* Show mobile version of apps section, hide desktop */
+            main > div:nth-child(10) > div > div:first-child > section { display: block; }
+            main > div:nth-child(10) > div > div:last-child > section { display: none; }
+            /* Styling for the simpler mobile app cards */
+            main > div:nth-child(10) > div > div:first-child > section .apps-cards-container a {
+                background-color: #fff;
+                padding: 16px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px; /* If they are stacked */
+            }
+            main > div:nth-child(10) > div > div:first-child > section .apps-cards-container a h2 {
+                font-size: 18px; margin: 0;
+            }
+            main > div:nth-child(10) > div > div:first-child > section .apps-cards-container a > div:last-child::after { /* Arrow */
+                content: '→'; font-size: 20px;
+            }
+
+
+            footer { padding: 32px 16px 16px; }
+            .footer-top { flex-direction: column; gap: 32px; margin-bottom: 32px; }
+            .footer-links { flex-direction: column; gap: 24px; }
+            .footer-links > div { flex-basis: auto; }
+            .footer-bottom { flex-direction: column; gap: 24px; align-items: flex-start;}
+            .footer-social-lang { flex-direction: column; align-items: flex-start; gap: 16px; width: 100%;}
+            .footer-social-lang > ul:last-of-type { flex-direction: column; align-items: flex-start; width: 100%;}
+            .footer-social-lang > ul:last-of-type li button { width: 100%; justify-content: flex-start; }
+            .footer-app-badges { width: 100%; }
+            .footer-app-badges div { justify-content: flex-start; }
+            .footer-legal { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .footer-legal ul { flex-direction: column; gap: 8px; align-items: flex-start; }
+        }
+
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div>
+            <div>
+                <div> <!-- This div wraps main and potentially other global elements -->
+                    <a href="#main">Skip to main content</a>
+                    
+                    <header class="desktop-header">
+                        <div>
+                            <div class="uber-logo">
+                                <a aria-label="Go to Uber.com" href="https://www.uber.com/" target="_self">Uber</a>
+                            </div>
+                            <nav role="navigation">
+                                <div>
+                                    <ul>
+                                        <li><a aria-label="Ride with Uber" href="https://m.uber.com/looking" target="_self">Ride</a></li>
+                                        <li><a aria-label="Drive with Uber" href="https://www.uber.com/us/en/drive/" target="_self">Drive</a></li>
+                                        <li><a aria-label="Grow your business with Uber" href="https://www.uber.com/us/en/business/" target="_self">Business</a></li>
+                                        <li><a aria-label="Learn more about Uber Eats" href="https://www.ubereats.com/" target="_self">Uber Eats</a></li>
+                                        <li>
+                                            <button aria-label="Learn more about Uber as a company">About<div></div></button>
+                                            <div> <!-- Dropdown for About -->
+                                                <ul aria-label="Menu" role="listbox">
+                                                    <li id="bui9val-0" role="option"><a aria-label="Learn more about Uber" href="https://www.uber.com/us/en/about/" target="_self"><div>About us</div></a></li>
+                                                    <li id="bui9val-1" role="option"><a aria-label="Learn more about Uber's offerings" href="https://www.uber.com/us/en/about/uber-offerings/" target="_self"><div>Our offerings</div></a></li>
+                                                    <li id="bui9val-2" role="option"><a aria-label="Learn more about how Uber works" href="https://www.uber.com/us/en/about/how-does-uber-work/" target="_self"><div>How Uber works</div></a></li>
+                                                    <li id="bui9val-3" role="option"><a aria-label="Sustainability" href="https://www.uber.com/us/en/about/sustainability/" target="_self"><div>Sustainability</div></a></li>
+                                                    <li aria-label="You are currently at an item that opens a nested listbox. Press right arrow to enter that element and left arrow to return." id="bui9val-4" role="option">
+                                                        <div><div>Explore</div><div></div></div>
+                                                        <!-- Nested UL for Explore would go here if it were to expand -->
+                                                    </li>
+                                                    <li id="bui9val-5" role="option"><a aria-label="Go to Uber's newsroom" href="https://www.uber.com/newsroom/" target="_self"><div>Newsroom</div></a></li>
+                                                    <li id="bui9val-6" role="option"><a aria-label="Learn more about Uber's investor relations" href="https://investor.uber.com/" target="_self"><div>Investor relations</div></a></li>
+                                                    <li id="bui9val-7" role="option"><a aria-label="Autonomous vehicles initiatives from Uber" href="https://www.uber.com/us/en/autonomous/" target="_self"><div>Autonomous</div></a></li>
+                                                    <li id="bui9val-8" role="option"><a aria-label="Uber Blog " href="https://www.uber.com/blog/" target="_blank"><div>Blog</div></a></li>
+                                                    <li id="bui9val-9" role="option"><a aria-label="Learn more about career opportunities at Uber" href="https://www.uber.com/us/en/careers/" target="_self"><div>Careers</div></a></li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <button aria-label="More">More<div></div></button>
+                                            <div> <!-- Dropdown for More -->
+                                                <ul aria-label="Menu" role="listbox">
+                                                    <li role="status" style="padding: 10px 20px;">No results</li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <ul>
+                                        <li>
+                                            <div> <!-- Search input container -->
+                                                <div><!-- Search Icon Placeholder --></div>
+                                                <div><input aria-label="Search Uber.com" name="" placeholder="Search Uber.com" type="text" value=""/></div>
+                                                <div role="button"><div role="button"></div></div> <!-- Clear button placeholder -->
+                                            </div>
+                                        </li>
+                                        <li class="lang-button">
+                                            <button aria-label="Change language"><div></div>EN</button>
+                                        </li>
+                                        <li><a aria-label="Get help" href="https://help.uber.com/" target="_self">Help</a></li>
+                                        <li><a aria-label="Log in to rider, driver, and delivery sites" href="https://auth.uber.com/login-redirect?next_url=https://www.uber.com" target="_self">Log in</a></li>
+                                        <li class="signup-button">
+                                            <button aria-label="Sign up to ride, drive, and get delivery">Sign up</button>
+                                            <div> <!-- Dropdown for Sign up -->
+                                                <div>
+                                                    <a aria-label="Sign up to ride" href="https://m.uber.com/looking/" target="_self"><div>Ride<div><div></div></div></div></a>
+                                                    <a aria-label="Sign up to drive" href="https://drivers.uber.com/" target="_self"><div>Drive &amp; deliver<div><div></div></div></div></a>
+                                                    <a aria-label="Sign up to access Uber Eats" href="https://ubereats.com/login-redirect/" target="_self"><div>Uber Eats<div><div></div></div></div></a>
+                                                    <a aria-label="Sign up for Uber for Business" href="https://business.uber.com/" target="_self"><div>Business<div><div></div></div></div></a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </nav>
+                        </div>
+                    </header>
+
+                    <header class="mobile-header">
+                        <div>
+                            <div class="uber-logo">
+                                <a aria-label="Go to Uber.com" href="https://www.uber.com/" target="_self">Uber</a>
+                            </div>
+                            <ul>
+                                <li class="search-btn"><button><div></div><!-- Search Icon --><div></div></button></li>
+                                <li><a aria-label="Log in to rider, driver, and delivery sites" href="https://auth.uber.com/login-redirect?next_url=https://www.uber.com" target="_self">Log in</a></li>
+                                <li class="signup-btn"><button aria-label="Sign up to ride, drive, and get delivery">Sign up</button></li>
+                                <li class="menu-btn"><button aria-label="Click to view more menu options"></button></li>
+                            </ul>
+                        </div>
+                    </header>
+                    
+                    <main id="main">
+                        <div class="hero-section-wrapper"> <!-- Wrapper for hero section -->
+                            <div class="hero-section-container">
+                                <div class="hero-section-content">
+                                    <section> <!-- Actual hero content section from HTML -->
+                                        <div><div><div><div><div><div><div><div><div><div>
+                                            <h1>Go anywhere with Uber</h1>
+                                        </div></div></div></div><div></div></div></div>
+                                        <div><div><div class="hero-form">
+                                            <div class="input-group">
+                                                <div>●</div> <!-- Placeholder for pin icon -->
+                                                <div class="input-wrapper" aria-label="pickup location input">
+                                                    <input aria-label="Enter your pickup location" role="combobox" value="" placeholder=" "/>
+                                                    <div>Pickup location</div>
+                                                </div>
+                                                <div><div style="font-size: 1.2em;">⌖</div></div> <!-- Placeholder for current location icon -->
+                                            </div>
+                                            <div class="input-group">
+                                                <div>●</div> <!-- Placeholder for pin icon -->
+                                                <div class="input-wrapper" aria-label="destination location input">
+                                                    <input aria-label="Enter your dropoff location" role="combobox" value="" placeholder=" "/>
+                                                    <div>Dropoff location</div>
+                                                </div>
+                                            </div>
+                                            <div class="date-time-group">
+                                                <div class="input-group">
+                                                    <div>📅</div>
+                                                    <div class="input-wrapper">
+                                                        <input aria-label="Select a date." name="" placeholder="Today" type="text" value=""/>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <div>🕒</div>
+                                                    <div class="input-wrapper" aria-label="Select a time, 12-hour format.">
+                                                        <input role="combobox" placeholder="Now"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="actions">
+                                                <a aria-label="See prices for your trip before you request" href="https://m.uber.com/looking">See prices</a>
+                                                <a aria-label="Log in to see your recent activity on your Uber account" href="https://auth.uber.com/login-redirect?next_url=https://www.uber.com" target="_self">
+                                                    <span>Log in to see your recent activity</span>
+                                                </a>
+                                            </div>
+                                        </div></div></div></div></div></div></div></div>
+                                    </section>
+                                </div>
+                                <div class="hero-section-image-placeholder">
+                                    <!-- This div is for the image on the right -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="suggestions-section"> <!-- Suggestions Section -->
+                           <div class="suggestions-section-inner">
+                             <h2>Suggestions</h2>
+                             <ul><li><div></div></li><li><div></div></li><li><div></div></li></ul>
+                           </div>
+                        </div>
+                        
+                        <!-- Content Sections -->
+                        <div class="content-section">
+                            <div class="content-section-inner">
+                                <div class="text-content">
+                                    <h2>Log in to see your recent activity</h2>
+                                    <p>View past trips, tailored suggestions, support resources, and more.</p>
+                                    <div class="actions">
+                                        <a aria-label="Log in to your Uber account" href="https://auth.uber.com/login-redirect?next_url=https://www.uber.com">Log in to your account</a>
+                                        <a aria-label="Don’t have an Uber account? Sign up to get one" href="https://get.uber.com/sign-up" target="_self"><span>Don’t have an Uber account? Sign up</span></a>
+                                    </div>
+                                </div>
+                                <div class="image-content">
+                                    <img alt="Recent activity illustration" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_698,h_465/v1677102588/assets/96/458413-b077-4587-b69a-62779799396c/original/DotCom_RecentActivity_NY_2x.png" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <div class="content-section-inner reverse">
+                                <div class="text-content">
+                                    <h2>Drive when you want, make what you need</h2>
+                                    <p>Make money on your schedule with deliveries or rides—or both. You can use your own car or choose a rental through Uber.</p>
+                                    <div class="actions">
+                                        <a aria-label="Get started by signing up to drive with Uber" href="https://drivers.uber.com/">Get started</a>
+                                        <a aria-label="Already have an Uber account? Sign in at this link" href="https://drivers.uber.com/" target="_self"><span>Already have an account? Sign in</span></a>
+                                    </div>
+                                </div>
+                                <div class="image-content">
+                                    <img alt="Driver illustration" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_698,h_465/v1677102721/assets/00/458531-0869-4455-8590-329009883514/original/DotCom_Drive_NY_2x.png" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <div class="content-section-inner">
+                                <div class="text-content">
+                                    <h2>The Uber you know, reimagined for business</h2>
+                                    <p>Uber for Business is a platform for managing global rides and meals, and local deliveries, for companies of any size.</p>
+                                    <div class="actions">
+                                        <a aria-label="Get started by learning about Uber for Business" href="https://www.uber.com/us/en/business/getting-started/">Get started</a>
+                                        <a aria-label="Check out our solutions to help your company" href="https://www.uber.com/us/en/business/" target="_self"><span>Check out our solutions</span></a>
+                                    </div>
+                                </div>
+                                <div class="image-content">
+                                    <img alt="Uber for Business illustration" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_698,h_465/v1677102785/assets/95/4585f3-0cc1-4358-9a38-629aseyf207c/original/DotCom_Business_NY_2x.png" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="content-section">
+                            <div class="content-section-inner reverse">
+                                <div class="text-content">
+                                    <h2>Our annual product showcase is here</h2>
+                                    <p>Go—Get 2025 is live. Explore all the latest products announced to help make your everyday more flexible, more affordable, and a little easier.</p>
+                                    <div class="actions">
+                                        <a aria-label="Discover what's new at Uber" href="https://www.uber.com/us/en/u/go-get/">Discover what’s new</a>
+                                    </div>
+                                </div>
+                                <div class="image-content">
+                                    <img alt="Go Get 2025 illustration" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_698,h_465/v1715787804/assets/36/510a2a-86ac-4398-9457-f13399097dd4/original/GoGet24_WebHomepage_Earn_Module_Desktop_698x465_2x.png" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <div class="content-section-inner">
+                                <div class="text-content">
+                                    <h2>Save on Uber and Uber Eats with Uber One membership</h2>
+                                    <p>Become an Uber One member for savings and exclusive perks on Uber and Uber Eats.<br/>Sign up for just $9.99/month.</p>
+                                    <div class="actions">
+                                        <a aria-label="Sign up to save on Uber and Uber Eats with Uber One membership" href="https://eats.sng.link/A99vk/mi87?_dl=ubereats%3A%2F%2Fsubscription%3Fentry-point%3Demail%26access-point%3Demail%26pass-campaign%3Dupsell_global_UOmarketingLP&amp;_smtype=3&amp;_forward_params=1&amp;_fallback_redirect=https%3A%2F%2Fwww.ubereats.com%2Fuber-one&amp;pcn=Uber_One_Page&amp;utm_campaign=Uber_One_Page">Sign up to save</a>
+                                    </div>
+                                </div>
+                                <div class="image-content">
+                                    <img alt="Uber One illustration" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_698,h_465/v1677102944/assets/77/4586c0-23db-4303-9785-e5c9f330f728/original/DotCom_UberOne_NY_2x.png" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="apps-section"> <!-- "It's easier in the apps" Section -->
+                            <div class="apps-section-inner">
+                                <!-- Desktop Version (with QR codes) -->
+                                <section> <!-- This is main > div:nth-child(10) > div > div:last-child > section -->
+                                    <h2>It’s easier in the apps</h2>
+                                    <div class="apps-cards-container">
+                                        <a class="app-card" aria-label="Download the Uber app by QR code or select button" href="https://rides.sng.link/Aw5zn/o42y?_dl=uber%3A%2F%2F&amp;_smtype=3&amp;pcn=uber-com-homepage-block&amp;mvid=[marketing-visitor-id]">
+                                            <div><img alt="QR code for Uber app" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_180,h_180/v1690830363/assets/71/350063-850d-486b-b197-835a2916f7f6/original/qr-code-3.svg"/></div>
+                                            <div class="app-info">
+                                                <h2>Download the Uber app</h2>
+                                                <p>Scan to download</p>
+                                            </div>
+                                            <div><!-- Arrow Icon --></div>
+                                        </a>
+                                        <a class="app-card" aria-label="Download the Driver app by QR code or select button" href="https://earn.sng.link/A3ir4p/mf0l?_dl=uberdriver%3A%2F%2F&amp;_smtype=3&amp;pcn=uber-com-homepage-block&amp;mvid=[marketing-visitor-id]">
+                                            <div><img alt="QR code for Driver app" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_180,h_180/v1690830363/assets/71/350063-850d-486b-b197-835a2916f7f6/original/qr-code-3.svg"/></div>
+                                            <div class="app-info">
+                                                <h2>Download the Driver app</h2>
+                                                <p>Scan to download</p>
+                                            </div>
+                                            <div><!-- Arrow Icon --></div>
+                                        </a>
+                                    </div>
+                                </section>
+                                <!-- Mobile Version (simpler cards) -->
+                                <section> <!-- This is main > div:nth-child(10) > div > div:first-child > section -->
+                                     <h2>It’s easier in the apps</h2>
+                                     <div class="apps-cards-container">
+                                        <a aria-label="Download the Uber app" href="https://rides.sng.link/Aw5zn/o42y?_dl=uber%3A%2F%2F&amp;_smtype=3&amp;pcn=uber-com-homepage-block&amp;mvid=[marketing-visitor-id]">
+                                            <div class="app-info"><h2>Download the Uber app</h2></div>
+                                            <div><!-- Arrow Icon --></div>
+                                        </a>
+                                        <a aria-label="Download the Driver app" href="https://earn.sng.link/A3ir4p/mf0l?_dl=uberdriver%3A%2F%2F&amp;_smtype=3&amp;pcn=uber-com-homepage-block&amp;mvid=[marketing-visitor-id]">
+                                            <div class="app-info"><h2>Download the Driver app</h2></div>
+                                            <div><!-- Arrow Icon --></div>
+                                        </a>
+                                     </div>
+                                </section>
+                            </div>
+                        </div>
+                        
+                        <!-- Empty spacer divs from HTML, can be ignored or used for spacing if needed -->
+                        <div><div></div></div>
+                        <div><div></div></div>
+                        <div><div></div></div>
+
+                        <div> <!-- Footer Wrapper -->
+                            <footer>
+                                <section>
+                                    <div><div> <!-- footer-inner -->
+                                        <div class="footer-top">
+                                            <div class="footer-logo-help">
+                                                <a aria-label="Uber" href="https://www.uber.com/" target="_self">Uber</a>
+                                                <a aria-label="Visit Uber's Help Center" href="https://help.uber.com/" target="_self"><p>Visit Help Center</p></a>
+                                            </div>
+                                            <div class="footer-links">
+                                                <div>
+                                                    <div><div>Company</div></div>
+                                                    <ul>
+                                                        <li><a aria-label="Visit About us" href="https://www.uber.com/us/en/about/" target="_self"><p>About us</p></a></li>
+                                                        <li><a aria-label="Visit Uber's Offerings" href="https://www.uber.com/us/en/about/uber-offerings/" target="_self"><p>Our offerings</p></a></li>
+                                                        <li><a aria-label="Visit Uber's Newsroom" href="https://www.uber.com/newsroom/" target="_self"><p>Newsroom</p></a></li>
+                                                        <li><a aria-label="Visit Investors" href="https://investor.uber.com/" target="_self"><p>Investors</p></a></li>
+                                                        <li><a aria-label="Visit Blog" href="https://www.uber.com/blog/" target="_self"><p>Blog</p></a></li>
+                                                        <li><a aria-label="Vist Careers" href="https://www.uber.com/us/en/careers/" target="_self"><p>Careers</p></a></li>
+                                                        <li><a aria-label="Visit Uber AI" href="https://www.uber.com/blog/engineering/ai/" target="_self"><p>Uber AI</p></a></li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <div><div>Products</div></div>
+                                                    <ul>
+                                                        <li><a aria-label="Ride with Uber" href="https://www.uber.com/us/en/ride/" target="_self"><p>Ride</p></a></li>
+                                                        <li><a aria-label="Drive with Uber" href="https://www.uber.com/us/en/drive/" target="_self"><p>Drive</p></a></li>
+                                                        <li><a aria-label="Deliver with Uber" href="https://www.uber.com/us/en/deliver/" target="_self"><p>Deliver</p></a></li>
+                                                        <li><a aria-label="Visit Uber Eats" href="https://www.ubereats.com/" target="_self"><p>Eat</p></a></li>
+                                                        <li><a aria-label="Visit Uber for Business" href="https://www.uber.com/us/en/business/" target="_self"><p>Uber for Business</p></a></li>
+                                                        <li><a aria-label="Visit Uber Freight" href="https://www.uberfreight.com/" target="_self"><p>Uber Freight</p></a></li>
+                                                        <li><a aria-label="Learn more about Uber gift cards" href="https://www.uber.com/us/en/gift-cards/" target="_self"><p>Gift cards</p></a></li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <div><div>Global citizenship</div></div>
+                                                    <ul>
+                                                        <li><a aria-label="Learn more about safety" href="https://www.uber.com/us/en/safety/" target="_self"><p>Safety</p></a></li>
+                                                        <li><a aria-label="Learn about Uber's commitment to sustainability" href="https://www.uber.com/us/en/about/sustainability/" target="_self"><p>Sustainability</p></a></li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <div><div>Travel</div></div>
+                                                    <ul>
+                                                        <li><a aria-label="Click to reserve an Uber ride" href="#" target="_self"><p>Reserve</p></a></li>
+                                                        <li><a aria-label="See all airports" href="https://www.uber.com/us/en/airports/" target="_self"><p>Airports</p></a></li>
+                                                        <li><a aria-label="See all cities" href="https://www.uber.com/us/en/r/cities/" target="_self"><p>Cities</p></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="footer-bottom">
+                                            <div class="footer-social-lang">
+                                                <ul>
+                                                    <li><div><a aria-label="Visit Uber's Facebook" href="https://www.facebook.com/uber" target="_blank"></a></div></li>
+                                                    <li><div><a aria-label="Visit Uber's Twitter" href="https://twitter.com/uber" target="_blank"></a></div></li>
+                                                    <li><div><a aria-label="Visit Uber's Youtube" href="https://www.youtube.com/channel/UCgnxoUwDmmyzeigmmcf0hZA" target="_blank"></a></div></li>
+                                                    <li><div><a aria-label="Visit Uber's LinkedIn" href="https://www.linkedin.com/company/1815218" target="_blank"></a></div></li>
+                                                    <li><div><a aria-label="Visit Uber's Instagram" href="https://instagram.com/uber/" target="_blank"></a></div></li>
+                                                </ul>
+                                                <ul>
+                                                    <li><button aria-label="Current language: English" lang="en"><div></div>English</button></li>
+                                                    <li><button aria-label="Seeing information for this city: Washington D.C." id="location-banner-button"><div></div><span id="location-banner-label">Washington D.C.</span></button></li>
+                                                </ul>
+                                            </div>
+                                            <div class="footer-app-badges">
+                                                <div>
+                                                    <a aria-label="Visit Google Play" href="#" target="_self"><img alt="Download the Uber app for Android" role="presentation" src="https://d1a3f4spazzrp4.cloudfront.net/uber-com/1.3.8/d1a3f4spazzrp4.cloudfront.net/illustrations/app-store-google-4d63c31a3e.svg"/></a>
+                                                    <a aria-label="Visit the App Store" href="#" target="_self"><img alt="Download the Uber app for IOS" role="presentation" src="https://d1a3f4spazzrp4.cloudfront.net/uber-com/1.3.8/d1a3f4spazzrp4.cloudfront.net/illustrations/app-store-apple-f1f919205b.svg"/></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="footer-legal">
+                                            <div><p><span>© 2025</span> Uber Technologies Inc.</p></div>
+                                            <div>
+                                                <ul>
+                                                    <li><a aria-label="Learn about Uber Privacy" href="https://www.uber.com/legal/document/?name=privacy-notice" target="_self"><p>Privacy</p></a></li>
+                                                    <li><a aria-label="Visit Uber Accessibility" href="https://www.uber.com/us/en/about/accessibility/" target="_self"><p>Accessibility</p></a></li>
+                                                    <li><a aria-label="Visit Terms and Conditions" href="https://www.uber.com/legal/document/?name=general-terms-of-use" target="_self"><p>Terms</p></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div></div>
+                                </section>
+                            </footer>
+                        </div>
+                        
+                        <!-- Mobile Menu Panel Content (from the end of the provided HTML) -->
+                        <!-- This would typically be controlled by JavaScript to show/hide -->
+                        <div class="mobile-menu-panel">
+                            <div> <!-- Wrapper for panel content -->
+                                <div class="close-btn"><button aria-label="Close"></button></div>
+                                <div> <!-- Language selection -->
+                                    <div><h2>Select your preferred language</h2></div>
+                                    <a aria-label="English" href="/us/en" target="_self"><span>English</span></a>
+                                    <a aria-label="简体中文" href="/us/zh" target="_self"><span>简体中文</span></a>
+                                    <a aria-label="Español (Internacional)" href="/us/es" target="_self"><span>Español (Internacional)</span></a>
+                                </div>
+                                <div> <!-- Main mobile navigation tree -->
+                                    <ul role="tree">
+                                        <li role="treeitem"><div><div><a aria-label="Ride with Uber" href="https://m.uber.com/looking" target="_self">Ride</a></div></div></li>
+                                        <li role="treeitem"><div><div><a aria-label="Drive with Uber" href="https://www.uber.com/us/en/drive/" target="_self">Drive</a></div></div></li>
+                                        <li role="treeitem"><div><div><a aria-label="Grow your business with Uber" href="https://www.uber.com/us/en/business/" target="_self">Business</a></div></div></li>
+                                        <li role="treeitem"><div><div><a aria-label="Learn more about Uber Eats" href="https://www.ubereats.com/" target="_self">Uber Eats</a></div></div></li>
+                                        <li role="treeitem">
+                                            <div><div><h3>About</h3><div></div></div></div>
+                                            <ul role="group">
+                                                <li role="treeitem"><div><div><a aria-label="Learn more about Uber" href="https://www.uber.com/us/en/about/" target="_self">About us</a></div></div></li>
+                                                <li role="treeitem"><div><div><a aria-label="Learn more about Uber's offerings" href="https://www.uber.com/us/en/about/uber-offerings/" target="_self">Our offerings</a></div></div></li>
+                                                <li role="treeitem"><div><div><a aria-label="Learn more about how Uber works" href="https://www.uber.com/us/en/about/how-does-uber-work/" target="_self">How Uber works</a></div></div></li>
+                                                <li role="treeitem"><div><div><a aria-label="Sustainability" href="https://www.uber.com/us/en/about/sustainability/" target="_self">Sustainability</a></div></div></li>
+                                                <li role="treeitem">
+                                                    <div><div><p>Explore</p><div></div></div></div>
+                                                    <ul role="group">
+                                                        <li role="treeitem">
+                                                            <div><div><p>Cities</p><div></div></div></div>
+                                                            <ul role="group">
+                                                                <li role="treeitem"><div><div><a aria-label=" Getting around New York City" href="#">Getting around New York City</a></div></div></li>
+                                                                <!-- More cities -->
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li role="treeitem"><div><div><a aria-label="Go to Uber's newsroom" href="https://www.uber.com/newsroom/" target="_self">Newsroom</a></div></div></li>
+                                                <!-- More About links -->
+                                            </ul>
+                                        </li>
+                                        <li role="treeitem"><div><div><a aria-label="Get help" href="https://help.uber.com/" target="_self">Help</a></div></div></li>
+                                    </ul>
+                                </div>
+                                <div class="lang-select-mobile">
+                                    <button aria-label="Change language"><div></div>EN</button>
+                                </div>
+                                <!-- Sections for Sign up / Sign in options in mobile menu -->
+                                <div>
+                                    <section>
+                                        <h2>Sign up</h2>
+                                        <div><div><div>
+                                            <a aria-label="Sign up to ride" href="#"><div></div><div><h2>Ride</h2></div><div><p></p></div></a>
+                                            <a aria-label="Sign up to drive" href="#"><div></div><div><h2>Drive &amp; deliver</h2></div><div><p></p></div></a>
+                                            <!-- More sign up options -->
+                                        </div></div></div>
+                                    </section>
+                                    <section>
+                                        <h2>Sign in</h2>
+                                        <div><div><div>
+                                            <a aria-label="Sign in to your driver or delivery account at Uber" href="#"><div></div><div><h2>Sign in to drive &amp; deliver</h2></div><div><p></p></div></a>
+                                            <!-- More sign in options -->
+                                        </div></div></div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+
+                    </main>
+                </div>
+                <div></div> <!-- Another sibling div to the main wrapper, from original HTML -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
