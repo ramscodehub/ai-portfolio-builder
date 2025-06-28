@@ -1,0 +1,124 @@
+# backend/app/api/endpoints.py
+import os
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import FileResponse
+
+# Import services, models, and config
+from app.services import scraper_service, llm_service
+from app.models.pydantic_models import (
+    UrlRequest, ScrapedContextResponse, ClonedHtmlFileResponse,
+    GalleryResponse, GalleryItem
+)
+from app.core import config
+
+router = APIRouter()
+
+@router.post("/get-scraped-context", response_model=ScrapedContextResponse, summary="Scrape and Clean Website Context")
+async def get_scraped_context_endpoint(req: UrlRequest):
+    try:
+        print(f"Scraping URL for tester context: {req.url}")
+        context_data = await scraper_service.scrape_website_context(req.url)
+        return ScrapedContextResponse(
+            desktop_screenshot_base64=context_data.desktop_screenshot_base64,
+            mobile_screenshot_base64=context_data.mobile_screenshot_base64,
+            simplified_html=context_data.simplified_html,
+            original_url=req.url
+        )
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        print(f"Unexpected error in /get-scraped-context: {type(e).__name__} - {e}")
+        raise HTTPException(status_code=500, detail=f"An unexpected server error occurred. Error: {str(e)}")
+
+@router.post("/clone-website-and-save", response_model=ClonedHtmlFileResponse, summary="Clone Website and Save HTML to File")
+async def clone_website_and_save_endpoint(req_body: UrlRequest, request: Request):
+    try:
+        print(f"Step 1: Scraping URL for cloning: {req_body.url}")
+        context_data = await scraper_service.scrape_website_context(req_body.url)
+        if not context_data.simplified_html or "failed" in context_data.simplified_html.lower() or "empty" in context_data.simplified_html.lower():
+            raise HTTPException(status_code=422, detail=f"HTML scraping/cleaning failed. HTML: {context_data.simplified_html[:200]}")
+        
+        ENABLE_LLM_CLONING = True
+        llm_generated_html = ""
+
+        if ENABLE_LLM_CLONING:
+            print("Step 2: Generating HTML with LLM...")
+            llm_generated_html = await llm_service.generate_html_with_llm(
+                cleaned_html=context_data.simplified_html,
+                desktop_screenshot_base64=context_data.desktop_screenshot_base64,
+                mobile_screenshot_base64=context_data.mobile_screenshot_base64
+            )
+            print("Step 3: Received HTML from LLM processing.")
+            if not llm_generated_html.strip():
+                 print("Warning: LLM returned an effectively empty HTML string.")
+        else:
+            print("Step 2 & 3: LLM Cloning is disabled. Generating placeholder HTML.")
+            llm_generated_html = f"<html><body><h1>Placeholder for {req_body.url}</h1><p>LLM cloning is currently disabled.</p></body></html>"
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        sanitized_url_part = req_body.url.split('//')[-1].split('/')[0].replace('.', '_').replace(':', '_')
+        filename = f"clone_{sanitized_url_part}_{timestamp}.html"
+        file_path = os.path.join(config.GENERATED_HTML_DIR_PATH, filename)
+        
+        try:
+            with open(file_path, "w", encoding="utf-8") as f: f.write(llm_generated_html)
+            print(f"Successfully saved cloned HTML to: {file_path}")
+        except IOError as e:
+            print(f"Error saving HTML file: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to save generated HTML file. Error: {str(e)}")
+        
+        base_url_parts = request.url.components
+        base_url = f"{base_url_parts.scheme}://{base_url_parts.netloc}"
+        view_link_path = f"{config.STATIC_CLONES_PATH_PREFIX}/{filename}"
+        view_link = f"{base_url}{view_link_path}"
+        
+        return ClonedHtmlFileResponse(
+            message="Website cloned and HTML saved." if ENABLE_LLM_CLONING else "Placeholder HTML generated.",
+            file_path=file_path,
+            view_link=view_link
+        )
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        print(f"Unexpected error in /clone-website-and-save: {type(e).__name__} - {e}")
+        raise HTTPException(status_code=500, detail=f"An unexpected server error occurred. Error: {str(e)}")
+
+@router.get("/gallery-items", response_model=GalleryResponse, summary="Get Items for Website Clone Gallery")
+async def get_gallery_items(request: Request):
+    items = []
+    base_url_parts = request.url.components
+    base_url = f"{base_url_parts.scheme}://{base_url_parts.netloc}"
+    gallery_data_map = {
+        "Landing Pages": [
+            {"id": "ola", "filename": "clone_www_olacabs_com_20250605_183343.html", "title": "Ola Cabs", "description": "Ride Hailing Service"},
+            {"id": "wix", "filename": "clone_www_wix_com_20250605_190834.html", "title": "Wix.com", "description": "Website Builder"},
+            {"id": "wordpress", "filename": "clone_wordpress_com_20250605_222253.html", "title": "WordPress.com", "description": "Blogging Platform"}],
+        "Portfolio Websites": [
+            {"id": "simplegreet", "filename": "clone_simple-greetings-1748253405653_vercel_app_20250605_193006.html", "title": "Simple Greetings", "description": "Portfolio Example"}],
+        "Ecommerce Sites": [
+            {"id": "uber", "filename": "clone_www_uber_com_20250605_175014.html", "title": "Uber.com", "description": "Ride & Delivery"}]}
+    for category, cat_items in gallery_data_map.items():
+        for item_data in cat_items:
+            local_file_path = os.path.join(config.GENERATED_HTML_DIR_PATH, item_data["filename"])
+            if not os.path.exists(local_file_path):
+                 print(f"Gallery item file missing, creating placeholder for: {item_data['filename']}")
+                 try:
+                     with open(local_file_path, "w", encoding="utf-8") as f_placeholder:
+                         f_placeholder.write(f"<html><body><h1>Placeholder for {item_data['title']}</h1><p>File: {item_data['filename']}</p></body></html>")
+                 except IOError:
+                     print(f"Could not create placeholder for {item_data['filename']}")
+            items.append(GalleryItem(id=item_data["id"], filename=item_data["filename"], view_link=f"{base_url}{config.STATIC_CLONES_PATH_PREFIX}/{item_data['filename']}", category=category, title=item_data["title"], description=item_data.get("description")))
+    return GalleryResponse(items=items)
+
+@router.get("/tester", response_class=FileResponse, summary="Get the Test Dashboard Page for Scraping Context")
+async def get_test_dashboard():
+    # Assumes tester.html is in the 'backend' directory, one level up from 'app'
+    tester_path = os.path.join(config.BASE_DIR, "..", "tester.html")
+    if not os.path.exists(tester_path):
+        # Fallback if it's next to main.py inside app
+        tester_path_alt = os.path.join(config.BASE_DIR, "tester.html")
+        if os.path.exists(tester_path_alt):
+            return FileResponse(tester_path_alt)
+        raise HTTPException(status_code=404, detail=f"tester.html not found at {tester_path} or alternate.")
+    return FileResponse(tester_path)
