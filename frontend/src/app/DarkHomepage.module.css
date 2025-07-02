@@ -1,10 +1,12 @@
 /* frontend/src/app/DarkHomePage.module.css */
+
+/* --- Main Layout & Header --- */
 .mainContainer {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1rem; /* Adjust padding */
+  padding: 2rem 1rem;
   background-color: var(--background-color);
 }
 
@@ -12,10 +14,10 @@
   width: 100%;
   max-width: var(--max-width);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  padding: 1.5rem 0; /* More padding for header */
-  margin-bottom: 4rem; /* More space below header */
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
 }
 
 .logoContainer {
@@ -24,37 +26,25 @@
   gap: 0.5rem;
 }
 
-.logoImage { /* Placeholder for AI image */
-  width: 32px;
-  height: 32px;
-  /* background-color: var(--accent-color); Simple placeholder */
-  /* border-radius: 50%; */
-}
-
-.logoText {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--primary-text-color);
-}
-
-/* Hero Section */
+/* --- Hero & Form Section --- */
 .heroSection {
   text-align: center;
-  max-width: 768px; /* Wider hero */
+  max-width: 768px;
+  width: 100%;
   margin-bottom: 5rem;
 }
 
 .heroHeadline {
-  font-family: var(--font-serif); /* Serif font for main headline */
-  font-size: 3.5rem; /* Larger headline */
+  font-family: var(--font-serif);
+  font-size: 3.5rem;
   font-weight: 700;
   line-height: 1.1;
-  color: #fff; /* White or very light gray for headline */
+  color: #fff;
   margin-bottom: 1.5rem;
 }
 
 .heroSubHeadline {
-  font-size: 1.125rem; /* Slightly smaller */
+  font-size: 1.125rem;
   color: var(--secondary-text-color);
   margin-bottom: 3rem;
   max-width: 600px;
@@ -62,269 +52,130 @@
   margin-right: auto;
 }
 
-.inputArea {
-  background-color: var(--surface-color);
-  border-radius: var(--card-border-radius); /* Matches Orchids' input area */
-  padding: 1.5rem; /* Ample padding inside input area */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Softer, darker shadow */
-  position: relative; /* For the submit button positioning */
+/* --- Form Styles (Using two cards) --- */
+.inputForm {
+  width: 100%;
+  max-width: 700px;
+  margin: 2rem auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Space between the two input cards */
 }
 
+/* Reusable style for a clean input "card" */
+.inputCard {
+  width: 100%;
+  background-color: #282828;
+  border-radius: var(--card-border-radius);
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid #3a3a3a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: left;
+}
+.inputCard:focus-within {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2);
+}
+
+.inputLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--secondary-text-color);
+  margin-bottom: 0.75rem;
+}
+
+/* Style for the single-line URL input inside its card */
 .urlInput {
   width: 100%;
-  background-color: transparent; /* Make input transparent against area bg */
+  background-color: transparent;
   border: none;
   color: var(--primary-text-color);
   font-size: 1rem;
-  padding: 0.75rem 0; /* Adjust padding */
-  padding-right: 3.5rem; /* Space for the button */
+  padding: 0.25rem 0;
   outline: none;
 }
 .urlInput::placeholder {
   color: var(--secondary-text-color);
-  opacity: 0.8;
+  opacity: 0.6;
 }
 
-.submitButton { /* This is the arrow button in Orchids.app */
-  position: absolute;
-  right: 1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: #333; /* Darker button */
-  color: var(--primary-text-color);
+/* Style for the resume textarea inside its card */
+.resumeTextarea {
+  width: 100%;
+  height: 250px; /* Fixed height */
+  background-color: transparent;
   border: none;
-  border-radius: 6px; /* Slightly rounded */
-  width: 36px;
-  height: 36px;
+  color: var(--primary-text-color);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 0;
+  outline: none;
+  resize: none; /* IMPORTANT: Disables user resizing */
+  overflow-y: auto; /* Adds a scrollbar if content overflows */
+}
+.resumeTextarea::placeholder {
+  color: var(--secondary-text-color);
+  opacity: 0.6;
+}
+
+/* Centered Submit Button */
+.submitButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.submitButton {
+  background-color: var(--accent-color);
+  color: #121212;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.8rem 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  gap: 0.5rem;
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(187, 134, 252, 0.2);
+  cursor: pointer;
 }
 .submitButton:hover:not(:disabled) {
-  background-color: #444;
+  background-color: var(--accent-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(187, 134, 252, 0.3);
 }
 .submitButton:disabled {
-  background-color: #2a2a2a;
+  background-color: #333;
+  color: var(--secondary-text-color);
   cursor: not-allowed;
-  opacity: 0.7;
-}
-.submitButton svg { /* Style for an arrow SVG if used */
-  width: 18px;
-  height: 18px;
+  box-shadow: none;
+  transform: none;
 }
 
-/* Gallery Section */
-.gallerySection {
-  width: 100%;
-  max-width: var(--max-width);
-  margin-top: 3rem; /* Space above gallery title */
-  text-align: center; /* Center title and category buttons */
-}
-
-.galleryMainTitle {
-  font-family: var(--font-serif);
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.75rem;
-}
-.gallerySubTitle {
-  color: var(--secondary-text-color);
-  margin-bottom: 2.5rem;
-}
-
-.categoryButtons {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-bottom: 3rem;
-}
-
-.categoryButton {
-  padding: 0.6rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 9999px; /* Pill shape */
-  border: 1px solid var(--border-color);
-  background-color: transparent;
-  color: var(--secondary-text-color);
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-}
-.categoryButton.active,
-.categoryButton:hover {
-  background-color: #fff;
-  color: #000;
-  border-color: #fff;
-}
-
-.galleryGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
-  text-align: left; /* Reset text align for cards */
-}
-
-.galleryCard {
-  background-color: var(--surface-color);
-  border-radius: var(--card-border-radius);
-  /* border: 1px solid var(--border-color); No border, rely on bg difference */
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s ease-in-out;
-}
-.galleryCard:hover {
-  transform: translateY(-4px);
-}
-
-.galleryCardPreviewContainer { /* To ensure aspect ratio or consistent preview area */
-  width: 100%;
-  aspect-ratio: 16 / 10; /* Adjust aspect ratio as needed */
-  background-color: #282828; /* Dark placeholder for preview area */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.galleryCardPreview { /* For iframe */
-  width: 100%;
-  height: 100%;
-  border: none;
-  transform: scale(0.9); /* Example: Slightly smaller preview inside container */
-  transform-origin: top left;
-}
-/* If using <img> for preview:
-.galleryCardPreviewImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-*/
-
-.galleryCardContent {
-  padding: 1.25rem;
-}
-
-.galleryCardTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--primary-text-color);
-  margin-bottom: 0.25rem;
-}
-
-.galleryCardDescription {
-  font-size: 0.875rem;
-  color: var(--secondary-text-color);
-  margin-bottom: 0.75rem;
-}
-
-.galleryCardLink { /* This is the "View Clone" or similar */
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--primary-text-color); /* Lighter link color on dark bg */
-  /* background-color: #333;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px; */
-  display: inline-block;
-}
-.galleryCardLink:hover {
-  color: var(--accent-color);
-  text-decoration: none;
-}
-
-/* Status and Error Messages */
-.statusMessage,
-.errorMessage {
-  margin-top: 1.5rem;
-  padding: 0.75rem;
-  border-radius: var(--border-radius);
-  text-align: center;
-}
-.errorMessage {
-  background-color: rgba(229, 62, 62, 0.2);
-  color: #e53e3e;
-}
-.statusMessage {
-  color: var(--secondary-text-color);
-}
-
-/* Main result iframe section (if different from gallery item preview) */
-.resultsSection {
-  width: 100%;
-  max-width: var(--max-width);
-  margin-top: 4rem;
-}
-.resultsSection h2 {
-  font-family: var(--font-serif);
-  font-size: 1.75rem;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #fff;
-}
-.resultsFrame {
-  width: 100%;
-  height: 75vh;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background-color: #fff; /* White background for the content being displayed */
-}
-/* Add or modify in frontend/src/app/DarkHomePage.module.css */
-
-/* ... (all your existing styles) ... */
-
-.statusMessageContainer {
-  margin-top: 1.5rem;
-  text-align: center;
-  padding: 1rem;
-  background-color: var(--surface-color); /* Or transparent */
-  border-radius: var(--border-radius);
-  max-width: 600px; /* Or adjust as needed */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.statusMessage {
-  /* You might already have styles for this, adjust if needed */
-  color: var(--secondary-text-color);
-  font-size: 0.9rem;
-  margin-bottom: 0.75rem; /* Add margin if UNO link is present */
-}
-.statusMessage:last-child { /* Remove margin if it's the only message */
-    margin-bottom: 0;
-}
-
-
-.unoLinkMessage {
-  font-size: 0.9rem;
-  color: var(--primary-text-color); /* Or secondary-text-color */
-}
-
-.unoLink {
-  color: var(--accent-color);
-  font-weight: 500;
-  text-decoration: underline;
-}
-
-.unoLink:hover {
-  color: var(--accent-color-hover);
-}
-
-/* Ensure galleryCardLinkWrapper provides a good click area if used */
-.galleryCardLinkWrapper {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  border-radius: var(--card-border-radius); /* Match card radius for hover effects */
-  transition: box-shadow 0.2s ease-in-out;
-}
-.galleryCardLinkWrapper:hover {
-  /* Optional: Add a subtle shadow to the link wrapper on hover */
-  box-shadow: 0 0 15px rgba(var(--accent-color-rgb, 187, 134, 252), 0.3);
-}
-
-/* The .galleryCard:hover transform translateY might be better on .galleryCardLinkWrapper:hover .galleryCard now */
-.galleryCardLinkWrapper:hover .galleryCard {
-  transform: translateY(-4px);
-}
+/* --- Status, Error, and Gallery styles (as they were) --- */
+.statusMessageContainer { margin-top: 1.5rem; text-align: center; padding: 1rem; background-color: var(--surface-color); border-radius: var(--border-radius); max-width: 600px; margin-left: auto; margin-right: auto; }
+.statusMessage { color: var(--secondary-text-color); font-size: 0.9rem; margin-bottom: 0.75rem; }
+.statusMessage:last-child { margin-bottom: 0; }
+.unoLinkMessage { font-size: 0.9rem; color: var(--primary-text-color); }
+.unoLink { color: var(--accent-color); font-weight: 500; text-decoration: underline; }
+.unoLink:hover { color: var(--accent-color-hover); }
+.errorMessage { margin-top: 1rem; padding: 0.75rem; border-radius: var(--border-radius); text-align: center; background-color: rgba(229, 62, 62, 0.2); color: #e53e3e; font-weight: 500; }
+.gallerySection { width: 100%; max-width: var(--max-width); margin-top: 5rem; text-align: center; }
+.galleryMainTitle { font-family: var(--font-serif); font-size: 2.25rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; }
+.gallerySubTitle { color: var(--secondary-text-color); margin-bottom: 2.5rem; }
+.categoryButtons { display: flex; justify-content: center; gap: 0.75rem; margin-bottom: 3rem; }
+.categoryButton { padding: 0.6rem 1.25rem; font-size: 0.875rem; font-weight: 500; border-radius: 9999px; border: 1px solid var(--border-color); background-color: transparent; color: var(--secondary-text-color); transition: background-color 0.2s, color 0.2s, border-color 0.2s; cursor: pointer; }
+.categoryButton.active, .categoryButton:hover { background-color: #fff; color: #000; border-color: #fff; }
+.galleryGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; text-align: left; }
+.galleryCard { background-color: var(--surface-color); border-radius: var(--card-border-radius); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; border: 1px solid transparent; cursor: pointer; }
+.galleryCard:hover { transform: translateY(-4px); border-color: var(--border-color); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); }
+.galleryCardPreviewContainer { width: 100%; aspect-ratio: 16 / 10; background-color: #282828; overflow: hidden; }
+.galleryCardPreview { width: 100%; height: 100%; border: none; }
+.galleryCardContent { padding: 1.25rem; }
+.galleryCardTitle { font-size: 1.125rem; font-weight: 600; color: var(--primary-text-color); margin-bottom: 0.25rem; }
+.galleryCardDescription { font-size: 0.875rem; color: var(--secondary-text-color); }
