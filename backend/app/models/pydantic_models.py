@@ -33,3 +33,15 @@ class ScrapedContext(BaseModel):
     desktop_screenshot_base64: str
     mobile_screenshot_base64: str
     simplified_html: str | None
+
+class PortfolioBuildConfig(BaseModel):
+    reference_url: str = Field(
+        ..., 
+        example="https://www.some-cool-portfolio.com",
+        description="The URL of the portfolio to use as a style reference."
+    )
+    resume_text: str = Field(
+        ..., 
+        example="John Doe\nSoftware Engineer at Tech Corp\nSkills: Python, React, AWS",
+        description="The user's full resume or profile information as a block of text."
+    )

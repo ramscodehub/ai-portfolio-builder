@@ -3,11 +3,12 @@ import os
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse
+import traceback
 
 # Import services, models, and config
 from app.services import scraper_service, llm_service
 from app.models.pydantic_models import (
-    UrlRequest, ScrapedContextResponse, ClonedHtmlFileResponse,
+    UrlRequest, PortfolioBuildConfig, ScrapedContextResponse, ClonedHtmlFileResponse,
     GalleryResponse, GalleryItem
 )
 from app.core import config
@@ -122,3 +123,69 @@ async def get_test_dashboard():
             return FileResponse(tester_path_alt)
         raise HTTPException(status_code=404, detail=f"tester.html not found at {tester_path} or alternate.")
     return FileResponse(tester_path)
+
+@router.post("/build-portfolio", response_model=ClonedHtmlFileResponse, summary="Build a Portfolio from a Reference URL and Resume")
+async def build_portfolio_endpoint(build_config: PortfolioBuildConfig, request: Request):
+    """
+    Orchestrates the portfolio building process:
+    1. Scrapes the reference URL for style.
+    2. Parses the user's resume text into structured JSON.
+    3. Generates a new HTML portfolio with the user's data in the reference style.
+    4. Saves the generated HTML and returns a link to it.
+    """
+    try:
+        # Step 1: Scrape the reference URL for its style and layout
+        print(f"Step 1: Scraping reference URL: {build_config.reference_url}")
+        scraped_context = await scraper_service.scrape_website_context(build_config.reference_url)
+        if not scraped_context.simplified_html or "failed" in scraped_context.simplified_html.lower():
+            raise HTTPException(status_code=422, detail="Scraping the reference URL failed. Cannot proceed.")
+
+        # Step 2: Parse the user's resume text into structured JSON
+        print("Step 2: Parsing resume text with LLM...")
+        resume_json = await llm_service.parse_resume_to_json(build_config.resume_text)
+        if not resume_json.get("name") and not resume_json.get("experience"): # Basic check for successful parse
+            raise HTTPException(status_code=422, detail="Failed to parse resume text into a usable format.")
+
+        # Step 3: Generate the new portfolio HTML using the style and content
+        print("Step 3: Generating new portfolio HTML with LLM...")
+        generated_portfolio_html = await llm_service.generate_portfolio_from_context(
+            scraped_context=scraped_context.model_dump(), # Pass the context as a dictionary
+            resume_json=resume_json
+        )
+        print("Step 4: Received generated portfolio HTML.")
+
+        if not generated_portfolio_html.strip():
+            raise HTTPException(status_code=500, detail="LLM generated a blank portfolio. Please try a different reference URL or adjust resume text.")
+
+        # Step 5: Save the generated file and create a view link
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Use the person's name for a more descriptive filename if available
+        person_name = resume_json.get("name", "portfolio").strip().replace(" ", "_").lower()
+        filename = f"{person_name}_portfolio_{timestamp}.html"
+        file_path = os.path.join(config.GENERATED_HTML_DIR_PATH, filename)
+        
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(generated_portfolio_html)
+            print(f"Successfully saved portfolio HTML to: {file_path}")
+        except IOError as e:
+            print(f"Error saving portfolio file: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to save generated portfolio file. Error: {str(e)}")
+        
+        base_url_parts = request.url.components
+        base_url = f"{base_url_parts.scheme}://{base_url_parts.netloc}"
+        view_link = f"{base_url}{config.STATIC_CLONES_PATH_PREFIX}/{filename}"
+        
+        return ClonedHtmlFileResponse(
+            message="Portfolio built and saved successfully.",
+            file_path=file_path,
+            view_link=view_link
+        )
+
+    except HTTPException as http_exc:
+        # Re-raise HTTPExceptions that are already well-formed
+        raise http_exc
+    except Exception as e:
+        print(f"Unexpected error in /build-portfolio endpoint: {type(e).__name__} - {e}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"An unexpected server error occurred during portfolio generation. Error: {str(e)}")
