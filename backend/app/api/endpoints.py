@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 import traceback
 
 # Import services, models, and config
-from app.services import scraper_service, llm_service
+from app.services import scraper_service, llm_service, s3_service
 from app.models.pydantic_models import (
     UrlRequest, PortfolioBuildConfig, ScrapedContextResponse, ClonedHtmlFileResponse,
     GalleryResponse, GalleryItem
@@ -161,25 +161,19 @@ async def build_portfolio_endpoint(build_config: PortfolioBuildConfig, request: 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         # Use the person's name for a more descriptive filename if available
         person_name = resume_json.get("name", "portfolio").strip().replace(" ", "_").lower()
-        filename = f"{person_name}_portfolio_{timestamp}.html"
-        file_path = os.path.join(config.GENERATED_HTML_DIR_PATH, filename)
-        
-        try:
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(generated_portfolio_html)
-            print(f"Successfully saved portfolio HTML to: {file_path}")
-        except IOError as e:
-            print(f"Error saving portfolio file: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to save generated portfolio file. Error: {str(e)}")
-        
-        base_url_parts = request.url.components
-        base_url = f"{base_url_parts.scheme}://{base_url_parts.netloc}"
-        view_link = f"{base_url}{config.STATIC_CLONES_PATH_PREFIX}/{filename}"
+        filename = f"portfolios/{person_name}_portfolio_{timestamp}.html"
+        file_path = f"s3://{config.S3_BUCKET_NAME}/{filename}"
+
+        # Step 6: Upload to S3 using the new service function
+        public_url = s3_service.upload_html_to_s3(
+            html_content=generated_portfolio_html,
+            filename=filename
+        )
         
         return ClonedHtmlFileResponse(
-            message="Portfolio built and saved successfully.",
-            file_path=file_path,
-            view_link=view_link
+            message="Portfolio built and deployed successfully.",
+            file_path=file_path, # S3 URI
+            view_link=public_url # Public HTTP URL
         )
 
     except HTTPException as http_exc:
