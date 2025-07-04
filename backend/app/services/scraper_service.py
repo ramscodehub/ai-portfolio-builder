@@ -7,6 +7,9 @@ from playwright.async_api import async_playwright
 from playwright_stealth import stealth_async
 from fastapi import HTTPException
 
+import os
+from app.models.pydantic_models import ScrapedContext
+from app.core import config # Import config to get BASE_DIR
 # Import the internal Pydantic model
 from app.models.pydantic_models import ScrapedContext
 

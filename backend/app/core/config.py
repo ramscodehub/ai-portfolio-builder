@@ -16,6 +16,10 @@ GENERATED_HTML_DIR_PATH = os.path.join(BASE_DIR, GENERATED_HTML_DIR_NAME)
 # URL Path Prefix for serving static files
 STATIC_CLONES_PATH_PREFIX = "/clones"
 
+# S3 Configuration
+S3_BUCKET_NAME = "ram-portfolio-clones"
+CLOUD_FRONT_DOMAIN = "https://d12dmeynqgk1fi.cloudfront.net"
+
 # CORS Origins
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
