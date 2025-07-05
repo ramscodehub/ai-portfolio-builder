@@ -6,8 +6,8 @@ import uvicorn
 
 # Create FastAPI instance
 app = FastAPI(
-    title="Orchids Challenge API",
-    description="A starter FastAPI template for the Orchids Challenge backend",
+    title="Portolio Builder API",
+    description="A starter FastAPI template for the Portfolio Builder backend",
     version="1.0.0"
 )
 
@@ -52,7 +52,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "orchids-challenge-api"}
+    return {"status": "healthy", "service": "portfolio-builder-api"}
 
 # Get all items
 

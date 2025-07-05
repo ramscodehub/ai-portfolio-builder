@@ -48,7 +48,7 @@ async def startup_event():
 # Define a simple root endpoint for health checks
 @app.get("/", summary="Health Check")
 async def health_check():
-    return {"status": "ok", "service": "Orchids Website Cloner API"}
+    return {"status": "ok", "service": "Ram's Website Cloner API"}
 
 # For running with `python -m app.main`
 if __name__ == "__main__":
