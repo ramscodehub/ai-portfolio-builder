@@ -6,7 +6,6 @@
   --border-radius: 8px; /* Standard border radius */
   --card-border-radius: 12px; /* For gallery cards */
 
-  /* Dark Theme Palette (inspired by Orchids.app) */
   --background-color: #121212; /* Very dark gray / near black */
   --surface-color: #1E1E1E; /* Slightly lighter for cards, input backgrounds */
   --primary-text-color: #E0E0E0; /* Light gray for primary text */
