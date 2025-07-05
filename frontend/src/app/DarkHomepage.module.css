@@ -31,7 +31,9 @@
 .unoLink:hover { color: var(--accent-color-hover); }
 .errorMessage { margin-top: 1rem; padding: 0.75rem; border-radius: var(--border-radius); text-align: center; background-color: rgba(229, 62, 62, 0.2); color: #e53e3e; font-weight: 500; }
 
-/* --- Gallery Section (Updated) --- */
+/* ... (All styles up to the gallery section remain the same) ... */
+
+/* --- Gallery Section --- */
 .gallerySection {
   width: 100%;
   max-width: var(--max-width);
@@ -49,32 +51,78 @@
 
 .gallerySubTitle {
   color: var(--secondary-text-color);
-  margin-bottom: 3rem; /* Increased space after subtitle */
+  margin-bottom: 3rem;
 }
-
-/* .categoryButtons class can be removed as it's no longer used */
 
 .galleryGrid {
   display: grid;
-  /* UPDATED: This will try to fit 4 columns on large screens */
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem; /* Slightly reduced gap */
+  gap: 1.5rem;
   text-align: left;
 }
 
-/* On larger screens, explicitly set to 4 columns */
 @media (min-width: 1200px) {
   .galleryGrid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
+.galleryCardLinkWrapper {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--card-border-radius);
+  transition: box-shadow 0.2s ease-in-out;
+}
+.galleryCardLinkWrapper:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
 
-/* Gallery Card styles (no changes needed) */
-.galleryCard { background-color: var(--surface-color); border-radius: var(--card-border-radius); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; border: 1px solid transparent; cursor: pointer; }
-.galleryCard:hover { transform: translateY(-4px); border-color: var(--border-color); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); }
-.galleryCardPreviewContainer { width: 100%; aspect-ratio: 16 / 10; background-color: #282828; overflow: hidden; }
-.galleryCardPreview { width: 100%; height: 100%; border: none; }
-.galleryCardContent { padding: 1.25rem; }
-.galleryCardTitle { font-size: 1.125rem; font-weight: 600; color: var(--primary-text-color); margin-bottom: 0.25rem; }
-.galleryCardDescription { font-size: 0.875rem; color: var(--secondary-text-color); }
+.galleryCard {
+  background-color: var(--surface-color);
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.2s ease-in-out;
+  border: 1px solid var(--border-color);
+}
+.galleryCardLinkWrapper:hover .galleryCard {
+  transform: translateY(-4px);
+}
+
+.galleryCardPreviewContainer {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background-color: #282828;
+  position: relative; /* IMPORTANT: Required for Next.js Image with fill prop */
+  overflow: hidden;
+}
+
+/* NEW: Style for the <Image> component */
+.galleryCardPreviewImage {
+  object-fit: cover; /* Ensures image covers the area, cropping if needed */
+  transition: transform 0.3s ease-in-out;
+}
+/* Optional: Add a subtle zoom effect on hover */
+.galleryCardLinkWrapper:hover .galleryCardPreviewImage {
+  transform: scale(1.05); 
+}
+
+.galleryCardContent {
+  padding: 1.25rem;
+  flex-grow: 1;
+}
+
+.galleryCardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--primary-text-color);
+  margin-bottom: 0.25rem;
+}
+
+.galleryCardDescription {
+  font-size: 0.875rem;
+  color: var(--secondary-text-color);
+}
