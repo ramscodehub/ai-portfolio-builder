@@ -173,3 +173,21 @@
   width: 24px; /* Set size for SVG icons */
   height: 24px;
 }
+
+.resultLinkButton {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.8rem 2.5rem;
+  background-color: var(--accent-color); /* Same as your main button */
+  color: #121212;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.resultLinkButton:hover {
+  background-color: var(--accent-color-hover);
+  transform: scale(1.05);
+}
