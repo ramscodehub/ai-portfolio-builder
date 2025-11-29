@@ -137,7 +137,7 @@ async def build_portfolio_endpoint(build_config: PortfolioBuildConfig, request: 
         # Step 1: Scrape the reference URL for its style and layout
         print(f"Step 1: Scraping reference URL: {build_config.reference_url}")
         scraped_context = await scraper_service.scrape_website_context(build_config.reference_url)
-        if not scraped_context.simplified_html or "failed" in scraped_context.simplified_html.lower():
+        if not scraped_context.simplified_html:
             raise HTTPException(status_code=422, detail="Scraping the reference URL failed. Cannot proceed.")
         if "Application error: a client-side exception has occurred" in scraped_context.simplified_html:
             print(f"ERROR: Detected a client-side crash on the reference site: {build_config.reference_url}")

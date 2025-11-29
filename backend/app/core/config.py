@@ -3,8 +3,9 @@ import os
 
 # GCP Configuration
 GCP_PROJECT_ID = "orchids-461923"
-GCP_LOCATION = "global"
-MODEL_NAME = "gemini-2.5-pro-preview-05-06"
+#GCP_LOCATION = "global"
+GCP_LOCATION = 'us-central1'
+MODEL_NAME = "gemini-2.5-pro"
 
 # Directory Configuration
 GENERATED_HTML_DIR_NAME = "generated_html_clones"

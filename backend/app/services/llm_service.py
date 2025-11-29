@@ -8,7 +8,7 @@ import google.cloud.aiplatform as aiplatform
 from vertexai.generative_models import GenerativeModel, Part, Image
 from vertexai.generative_models import GenerationConfig, SafetySetting, HarmCategory, HarmBlockThreshold
 import google.api_core.exceptions
-
+import json
 # Import config variables
 from app.core import config
 
@@ -33,6 +33,10 @@ def initialize_vertex_ai():
         return False
 
 async def generate_html_with_llm(cleaned_html: str, desktop_screenshot_base64: str, mobile_screenshot_base64: str) -> str:
+    '''
+    This function is for any website, not for a portfolio website
+    doesnt take resume in form of json unlike the other one.
+    '''
     if not initialize_vertex_ai():
         raise HTTPException(status_code=500, detail="Vertex AI not initialized or initialization failed.")
     
@@ -223,32 +227,62 @@ async def generate_portfolio_from_context(
         raise HTTPException(status_code=500, detail="Vertex AI not initialized for portfolio generation.")
 
     builder_model_name = config.MODEL_NAME # Or config.BUILDER_MODEL_NAME
-
-    # This prompt is the new "builder" prompt
     system_prompt = """
-You are an expert web developer tasked with building a beautiful, single-page personal portfolio.
-You will be given three pieces of information:
-1.  **Style Guide:** Screenshots (desktop and mobile) of a reference website to define the visual aesthetic (layout, colors, typography, spacing, component styles).
-2.  **Structural Guide:** A cleaned HTML structure from the reference website. Use this to understand the layout and section order (e.g., hero, about, projects, experience).
-3.  **User Content:** A JSON object containing the user's personal information (name, skills, experience, projects, etc.).
+    You are an expert web developer and UI/UX designer. You are building a single-page personal portfolio.
 
-Your task is to generate a single, self-contained HTML file. This file must:
--   Visually match the style of the provided screenshots.
--   Use the layout and sectioning of the provided HTML structure as a guide.
--   Be populated exclusively with the user's data from the provided JSON object. DO NOT use any text content from the reference site's HTML.
--   If a user image is needed, use a gender-neutral illustrated avatar (not realistic or photo-based). Prefer stylized, cartoon-style avatars from sources like example : DiceBear or Avataaars, which preserve anonymity and inclusivity.
--   Intelligently map the JSON data to the appropriate sections. For example:
-    -   `name` and `headline` from the JSON go into the hero/header section.
-    -   The `experience` array from the JSON should be used to create a list of jobs in the "Experience" or "Work" section of the layout.
-    -   The `projects` array should be used to create project cards in the "Projects" section.
-    -   The `skills` array should be displayed in a "Skills" section.
--   All CSS must be in a single `<style>` block in the `<head>`.
--   The final output must be ONLY the complete HTML code, starting with <!DOCTYPE html>.
-"""
-    # This function reuses the same logic as generate_html_with_llm, but with a different prompt
-    # and includes the resume_json in the prompt parts.
-    
-    import json
+    ### INPUTS
+    1.  **Visual Reference:** Screenshots of a high-quality personal website.
+    2.  **Code Reference:** The HTML structure of that website.
+    3.  **User Data:** A JSON object containing the user's real details.
+
+    ### YOUR GOAL
+    Create a single, self-contained HTML file that **replicates the design** of the Reference but **displays the User Data**.
+
+    ### STRICT GUIDELINES
+
+    1.  **CSS & Frameworks (CRITICAL):**
+        -   Analyze the "Code Reference". If the site uses a CSS framework like **Tailwind CSS** or **Bootstrap**, you MUST include the CDN link for that framework in the `<head>`.
+        -   *Example:* `<script src="https://cdn.tailwindcss.com"></script>`
+        -   Do not try to write manual CSS for utility classes (e.g., `text-xl`, `p-4`). Let the CDN handle it.
+        -   For custom styling not covered by the framework, use a `<style>` block.
+
+    2.  **Visual Structure (Fixing "Empty Box" Issues):**
+        -   **Convert Backgrounds to Images:** If the Reference Style uses CSS background images (common in Netflix/Media clones), you MUST replace them with actual `<img>` tags inside the container.
+        -   Use the class `object-cover w-full h-full absolute inset-0 -z-10` (or equivalent CSS) to make the image fill the card.
+        -   Ensure text overlays are legible (add a linear-gradient overlay if text is white on a bright image).
+
+    3.  **Dynamic Imagery (No Placeholders):**
+        -   **User Avatar:** Use this specific URL format:
+            `https://api.dicebear.com/9.x/avataaars-neutral/svg?seed={UserFirstName}-{RandomAdjective}&backgroundColor=c0aede,b6e3f4,ffdfbf,ffd5dc,d1d4f9`
+            *CRITICAL:* You MUST pick a different random adjective (e.g., 'Creative', 'Happy', 'Sunny', 'Cool') to append to the seed so the avatar is unique every time.
+        
+        -   **Project Images:** Do NOT use gray boxes. Generate a unique AI image URL for each project based on its title/description:
+            `https://image.pollinations.ai/prompt/{VISUAL_PROMPT}?width=1280&height=720&nologo=true` (Note: Use 720p for speed)
+            *Examples:*
+            -   Project "Crypto App" -> `.../prompt/crypto+dashboard+neon+dark+mode...`
+            -   Project "Travel Blog" -> `.../prompt/beautiful+mountains+sunset+hiking...`
+            **CRITICAL UX FIX:** To prevent "broken image" look while the AI generates the image, you MUST:
+                1. Add a dark background color class: `bg-gray-800` (or `bg-neutral-800` for Tailwind).
+                2. Add a loading animation class: `animate-pulse`.
+                3. Add an onload handler: `onload="this.classList.remove('animate-pulse'); this.classList.remove('bg-gray-800')"`
+                This ensures the user sees a pulsing placeholder until the image is ready.
+
+    4.  **Content Mapping:**
+        -   **Strictly User Data:** Do NOT use "Lorem Ipsum" or text from the Reference site. Use ONLY the JSON data.
+        -   **Smart Adaptation:** 
+            -   If the Reference has a "Testimonials" section but the User JSON has no testimonials, **REMOVE** that section entirely.
+            -   If the User JSON has "Skills" but the Reference didn't show them, find a clean place to insert a Skills section that matches the design.
+
+    5.  **Interactive Elements:**
+        -   Ensure the Mobile Menu (hamburger) works using vanilla JavaScript inside a `<script>` tag at the bottom of the `<body>`.
+        -   Ensure smooth scrolling for navigation links (`html { scroll-behavior: smooth; }`).
+
+    ### OUTPUT FORMAT
+    -   Return ONLY valid HTML code.
+    -   Start immediately with `<!DOCTYPE html>`.
+    -   Do not wrap the output in markdown (```html ... ```).
+
+    """
     max_retries = 2; base_delay = 5
     current_max_output_tokens = 65000
 
